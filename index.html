@@ -337,6 +337,9 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 .cal-chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal-chip-rm { background: none; border: none; cursor: pointer; color: inherit; opacity: .45; font-size: 14px; padding: 0; flex-shrink: 0; line-height: 1; transition: opacity .12s; }
 .cal-chip-rm:hover { opacity: 1; }
+.cal-chip-extend { background: none; border: none; cursor: col-resize; color: inherit; opacity: .3; font-size: 11px; padding: 0 0 0 1px; flex-shrink: 0; line-height: 1; transition: opacity .12s; user-select: none; }
+.cal-chip-extend:hover { opacity: .8; }
+.cal-cell.extend-over { background: rgba(45,106,79,.15) !important; outline: 2px dashed var(--accent); outline-offset: -2px; }
 .cal-add-btn { align-self: flex-start; font-size: 10px; color: var(--text-3); border: 1px dashed var(--border); border-radius: 4px; background: none; cursor: pointer; padding: 2px 7px; transition: all .12s; white-space: nowrap; margin-top: auto; }
 .cal-add-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
 
@@ -1136,6 +1139,8 @@ function renderPlan() {
 
 let calDragEntryId = null
 let calDragRecipeId = null
+let calExtendEntryId = null
+let calExtendMealType = null
 
 function onCalDragStart(e, entryId) {
   calDragEntryId = entryId
@@ -1145,19 +1150,58 @@ function onCalDragStart(e, entryId) {
 }
 function onCalDragEnd(e) {
   document.querySelectorAll('.cal-chip.dragging,.palette-chip.dragging').forEach(c => c.classList.remove('dragging'))
-  document.querySelectorAll('.cal-cell.drag-over').forEach(c => c.classList.remove('drag-over'))
+  document.querySelectorAll('.cal-cell.drag-over,.cal-cell.extend-over').forEach(c => { c.classList.remove('drag-over'); c.classList.remove('extend-over') })
 }
 function onCalDragOver(e) {
   e.preventDefault()
-  e.dataTransfer.dropEffect = 'move'
-  e.currentTarget.classList.add('drag-over')
+  if (calExtendEntryId) {
+    if (e.currentTarget.dataset.meal === calExtendMealType) {
+      e.dataTransfer.dropEffect = 'copy'
+      e.currentTarget.classList.add('extend-over')
+    }
+  } else {
+    e.dataTransfer.dropEffect = 'move'
+    e.currentTarget.classList.add('drag-over')
+  }
 }
 function onCalDragLeave(e) {
-  if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.classList.remove('drag-over')
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('drag-over')
+    e.currentTarget.classList.remove('extend-over')
+  }
 }
 async function onCalDrop(e, date, mealType) {
   e.preventDefault()
   e.currentTarget.classList.remove('drag-over')
+  e.currentTarget.classList.remove('extend-over')
+
+  if (calExtendEntryId) {
+    if (mealType !== calExtendMealType) { calExtendEntryId = null; calExtendMealType = null; return }
+    const src = planEntries.find(x => x.id === calExtendEntryId)
+    if (!src || src.date === date) { calExtendEntryId = null; calExtendMealType = null; return }
+    const srcDate = new Date(src.date + 'T00:00:00')
+    const tgtDate = new Date(date + 'T00:00:00')
+    const dir = tgtDate > srcDate ? 1 : -1
+    const toInsert = []
+    const cur = new Date(srcDate)
+    cur.setDate(cur.getDate() + dir)
+    while (true) {
+      const dk = dateKey(cur)
+      const exists = planEntries.some(x => x.date === dk && x.meal_type === mealType && x.recipe_id === src.recipe_id)
+      if (!exists) toInsert.push(dk)
+      if (dk === date) break
+      cur.setDate(cur.getDate() + dir)
+    }
+    if (toInsert.length) {
+      const rows = toInsert.map(d => ({ date: d, meal_type: mealType, recipe_id: src.recipe_id, user_id: currentUser.id }))
+      const { data, error } = await sb.from('plan_entries').insert(rows).select()
+      if (!error && data) { planEntries.push(...data); renderPlan() }
+    }
+    calExtendEntryId = null
+    calExtendMealType = null
+    return
+  }
+
   if (calDragEntryId) {
     const { data, error } = await sb.from('plan_entries')
       .update({ date, meal_type: mealType })
@@ -1175,6 +1219,19 @@ async function onCalDrop(e, date, mealType) {
     if (!error && data) { planEntries.push(data); renderPlan() }
     calDragRecipeId = null
   }
+}
+function onExtendDragStart(e, entryId, mealType) {
+  e.stopPropagation()
+  calExtendEntryId = entryId
+  calExtendMealType = mealType
+  calDragEntryId = null
+  calDragRecipeId = null
+  e.dataTransfer.effectAllowed = 'copy'
+}
+function onExtendDragEnd(e) {
+  document.querySelectorAll('.cal-cell.extend-over').forEach(c => c.classList.remove('extend-over'))
+  calExtendEntryId = null
+  calExtendMealType = null
 }
 function onPaletteDragStart(e, recipeId) {
   calDragRecipeId = recipeId
@@ -1233,7 +1290,7 @@ function renderWeek() {
             const dk = dateKey(d)
             const isToday = dk === today
             const entries = getEntriesForDay(dk).filter(e => e.meal_type === mt.key)
-            return `<div class="cal-cell${isToday ? ' today-col' : ''}"
+            return `<div class="cal-cell${isToday ? ' today-col' : ''}" data-meal="${mt.key}"
               ondragover="onCalDragOver(event)"
               ondragleave="onCalDragLeave(event)"
               ondrop="onCalDrop(event,'${dk}','${mt.key}')">
@@ -1244,6 +1301,10 @@ function renderWeek() {
                   ondragend="onCalDragEnd(event)">
                   <span class="cal-chip-name" title="${escHtml(r.name)}">${r.emoji || '🍽️'} ${escHtml(r.name)}</span>
                   <button class="cal-chip-rm" onclick="event.stopPropagation();removeMeal(${e.id})">×</button>
+                  <span class="cal-chip-extend" draggable="true"
+                    ondragstart="onExtendDragStart(event,${e.id},'${mt.key}')"
+                    ondragend="onExtendDragEnd(event)"
+                    title="Растянуть на несколько дней">⟩</span>
                 </div>` : ''
               }).join('')}
               <button class="cal-add-btn" onclick="openAddModal('${dk}','${mt.key}','${mt.label}',${d.getDate()},'${RU_MONTHS_GEN[d.getMonth()]}')">+ добавить</button>
