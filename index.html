@@ -27,10 +27,37 @@
   --dinner: #EAF0FB; --dinner-t: #1A3A6B;
   --snack: #FAE8F0; --snack-t: #6B1A3A;
   --dessert: #F3E8FF; --dessert-t: #5B21B6;
+  --food-fish: #E0F2FE; --food-fish-t: #075985;
+  --food-meat: #FEE2E2; --food-meat-t: #991B1B;
+  --food-veggie: #DCFCE7; --food-veggie-t: #166534;
+  --food-neutral: #F1EFE8; --food-neutral-t: #6B6560;
   --danger: #FEE2E2; --danger-t: #991B1B;
   --r: 10px;
   --r-lg: 16px;
   --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+}
+[data-theme="dark"] {
+  --bg: #141512;
+  --surface: #1E211C;
+  --border: #33382F;
+  --border-strong: #545C4E;
+  --text: #F4F1EA;
+  --text-2: #B8B1A6;
+  --text-3: #837B70;
+  --accent: #74C69D;
+  --accent-light: #22392D;
+  --accent-text: #B7E4C7;
+  --breakfast: #3B2C19; --breakfast-t: #F5C87A;
+  --lunch: #20382A; --lunch-t: #95D5B2;
+  --dinner: #202D44; --dinner-t: #AFCBFF;
+  --snack: #3A2030; --snack-t: #F0A6CA;
+  --dessert: #302343; --dessert-t: #C4B5FD;
+  --food-fish: #17324A; --food-fish-t: #93C5FD;
+  --food-meat: #411D1D; --food-meat-t: #FCA5A5;
+  --food-veggie: #193B25; --food-veggie-t: #86EFAC;
+  --food-neutral: #2A2D27; --food-neutral-t: #B8B1A6;
+  --danger: #421C1C; --danger-t: #FCA5A5;
+  --shadow: 0 1px 3px rgba(0,0,0,.28), 0 8px 20px rgba(0,0,0,.22);
 }
 body {
   font-family: 'Manrope', sans-serif;
@@ -268,6 +295,10 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 .cat-dinner { background: var(--dinner); color: var(--dinner-t); }
 .cat-snack { background: var(--snack); color: var(--snack-t); }
 .cat-dessert { background: var(--dessert); color: var(--dessert-t); }
+.cat-food-fish { background: var(--food-fish); color: var(--food-fish-t); }
+.cat-food-meat { background: var(--food-meat); color: var(--food-meat-t); }
+.cat-food-veggie { background: var(--food-veggie); color: var(--food-veggie-t); }
+.cat-food-neutral { background: var(--food-neutral); color: var(--food-neutral-t); }
 .rc-time { font-size: 12px; color: var(--text-3); }
 .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
 .filter-chip { padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px; font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; background: none; color: var(--text-2); transition: all .15s; }
@@ -320,8 +351,8 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .recipe-palette { margin-top: 20px; }
 .palette-group { margin-bottom: 14px; }
 .palette-group-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 7px; }
-.palette-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.palette-chip { border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 500; cursor: grab; display: flex; align-items: center; gap: 5px; user-select: none; transition: opacity .15s, transform .12s, box-shadow .12s; white-space: nowrap; }
+.palette-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.palette-chip { border-radius: 7px; padding: 8px 13px; font-size: 14px; font-weight: 600; cursor: grab; display: flex; align-items: center; gap: 7px; user-select: none; transition: opacity .15s, transform .12s, box-shadow .12s; white-space: nowrap; }
 .palette-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .palette-chip:active { cursor: grabbing; transform: none; }
 .palette-chip.dragging { opacity: .3; }
@@ -330,6 +361,10 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .palette-chip.dinner { background: var(--dinner); color: var(--dinner-t); }
 .palette-chip.snack { background: var(--snack); color: var(--snack-t); }
 .palette-chip.dessert { background: var(--dessert); color: var(--dessert-t); }
+.palette-chip.food-fish { background: var(--food-fish); color: var(--food-fish-t); }
+.palette-chip.food-meat { background: var(--food-meat); color: var(--food-meat-t); }
+.palette-chip.food-veggie { background: var(--food-veggie); color: var(--food-veggie-t); }
+.palette-chip.food-neutral { background: var(--food-neutral); color: var(--food-neutral-t); }
 .cal-cell.today-col { background: rgba(45,106,79,.04); }
 .cal-cell.past-col { opacity: 0.45; }
 .cal-cell.past-col .cal-add-btn { display: none; }
@@ -341,6 +376,8 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .cal-chip.selected.lunch { background: #8ECBA8; }
 .cal-chip.selected.dinner { background: #93B8E0; }
 .cal-chip.selected.snack { background: #E898BB; }
+[data-theme="dark"] .cal-chip { filter: saturate(.62) brightness(.82); }
+[data-theme="dark"] .cal-chip.selected { filter: saturate(1.15) brightness(1.12); }
 .cal-chip-rm-sel { display: none; background: none; border: none; cursor: pointer; color: inherit; font-size: 14px; padding: 0; flex-shrink: 0; line-height: 1; opacity: .6; transition: opacity .12s; }
 .cal-chip-rm-sel:hover { opacity: 1; }
 .cal-chip.selected .cal-chip-rm-sel { display: inline-flex; align-items: center; }
@@ -353,6 +390,11 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .cal-chip.lunch { background: var(--lunch); color: var(--lunch-t); }
 .cal-chip.dinner { background: var(--dinner); color: var(--dinner-t); }
 .cal-chip.snack { background: var(--snack); color: var(--snack-t); }
+.cal-chip.food-fish { background: var(--food-fish); color: var(--food-fish-t); }
+.cal-chip.food-meat { background: var(--food-meat); color: var(--food-meat-t); }
+.cal-chip.food-veggie { background: var(--food-veggie); color: var(--food-veggie-t); }
+.cal-chip.food-dessert { background: var(--dessert); color: var(--dessert-t); }
+.cal-chip.food-neutral { background: var(--food-neutral); color: var(--food-neutral-t); }
 .cal-chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal-cell.extend-over { background: rgba(45,106,79,.15) !important; outline: 2px dashed var(--accent); outline-offset: -2px; }
 .cal-add-btn { align-self: flex-start; font-size: 10px; color: var(--text-3); border: 1px dashed var(--border); border-radius: 4px; background: none; cursor: pointer; padding: 2px 7px; transition: all .12s; white-space: nowrap; margin-top: auto; }
@@ -390,6 +432,11 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .month-dot.lunch { background: var(--lunch); color: var(--lunch-t); }
 .month-dot.dinner { background: var(--dinner); color: var(--dinner-t); }
 .month-dot.snack { background: var(--snack); color: var(--snack-t); }
+.month-dot.food-fish { background: var(--food-fish); color: var(--food-fish-t); }
+.month-dot.food-meat { background: var(--food-meat); color: var(--food-meat-t); }
+.month-dot.food-veggie { background: var(--food-veggie); color: var(--food-veggie-t); }
+.month-dot.food-dessert { background: var(--dessert); color: var(--dessert-t); }
+.month-dot.food-neutral { background: var(--food-neutral); color: var(--food-neutral-t); }
 .month-add-btn {
   font-size: 9px;
   color: var(--text-3);
@@ -426,11 +473,36 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .shop-add-row { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
 .shop-add-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r); font-family: 'Manrope', sans-serif; font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border-color .15s; }
 .shop-add-row input:focus { border-color: var(--accent); }
-.shop-date-range { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.shop-date-wrap { position: relative; display: inline-block; margin-bottom: 18px; }
+.shop-date-range { display: flex; align-items: center; gap: 8px; }
 .shop-date-range label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); white-space: nowrap; }
-.shop-date-range input[type=date] { border: 1px solid var(--border); border-radius: var(--r); padding: 6px 10px; font-family: 'Manrope', sans-serif; font-size: 13px; background: var(--surface); color: var(--text); outline: none; transition: border-color .15s; }
-.shop-date-range input[type=date]:focus { border-color: var(--accent); }
+.shop-date-range input { width: 136px; border: 1px solid var(--border); border-radius: var(--r); padding: 6px 10px; font-family: 'Manrope', sans-serif; font-size: 13px; background: var(--surface); color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s; cursor: pointer; }
+.shop-date-range input:focus { border-color: #0B8DFF; box-shadow: 0 0 0 3px rgba(11,141,255,.12); }
 .shop-date-range .sep { color: var(--text-3); }
+.shop-period-pill { min-width: 78px; padding: 6px 10px; border-radius: 999px; background: rgba(11,141,255,.1); color: #075EA8; font-size: 12px; font-weight: 800; text-align: center; white-space: nowrap; }
+[data-theme="dark"] .shop-period-pill { background: rgba(11,141,255,.18); color: #93C5FD; }
+.shop-calendar-popover { display: none; position: absolute; left: 0; top: calc(100% + 8px); width: 650px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: 0 22px 70px rgba(0,0,0,.22); z-index: 60; }
+.shop-calendar-popover.open { display: block; }
+.shop-cal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.shop-cal-nav { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); cursor: pointer; font-size: 18px; line-height: 1; }
+.shop-cal-nav:hover { border-color: #0B8DFF; color: #0B8DFF; }
+.shop-cal-hint { font-size: 13px; color: var(--text-2); font-weight: 600; }
+.shop-cal-months { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.shop-cal-title { text-align: center; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.shop-cal-week, .shop-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.shop-cal-week span { text-align: center; font-size: 10px; font-weight: 800; color: var(--text-3); text-transform: uppercase; padding-bottom: 6px; }
+.shop-cal-day { height: 36px; border: 0; background: transparent; color: var(--text); font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 0; position: relative; }
+.shop-cal-day:hover { color: #0B8DFF; background: rgba(11,141,255,.08); border-radius: 10px; }
+.shop-cal-day.muted { color: var(--text-3); opacity: .35; cursor: default; pointer-events: none; }
+.shop-cal-day.in-range { background: rgba(11,141,255,.12); color: #075EA8; }
+.shop-cal-day.start, .shop-cal-day.end { background: #0B8DFF; color: #fff; border-radius: 10px; }
+.shop-cal-day.start:not(.end) { border-radius: 10px 0 0 10px; }
+.shop-cal-day.end:not(.start) { border-radius: 0 10px 10px 0; }
+[data-theme="dark"] .shop-cal-day.in-range { color: #93C5FD; background: rgba(11,141,255,.2); }
+@media (max-width: 760px) {
+  .shop-calendar-popover { width: min(650px, calc(100vw - 40px)); }
+  .shop-cal-months { grid-template-columns: 1fr; }
+}
 .shop-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
 .shop-filter-chip { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-2); cursor: pointer; transition: all .12s; white-space: nowrap; }
 .shop-filter-chip:hover { border-color: var(--accent); color: var(--accent); }
@@ -463,6 +535,26 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
 .modal h3 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+.recipe-modal { max-width: 980px; }
+.recipe-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 20px; }
+.recipe-modal-head h3 { margin-bottom: 0; }
+.recipe-form-grid { display: grid; grid-template-columns: minmax(300px, .9fr) minmax(360px, 1.1fr); gap: 22px; align-items: start; }
+.recipe-form-left, .recipe-form-right { min-width: 0; }
+.recipe-form-right { border-left: 1px solid var(--border); padding-left: 22px; }
+.recipe-form-right .fg textarea { min-height: 360px; height: calc(90vh - 310px); max-height: 560px; line-height: 1.55; }
+.emoji-field { position: relative; display: flex; gap: 8px; align-items: center; }
+.recipe-title-combo { position: relative; display: flex; align-items: center; min-height: 40px; border: 1px solid var(--border); border-radius: var(--r); background: var(--bg); overflow: visible; transition: border-color .15s, background .15s; }
+.recipe-title-combo:focus-within { border-color: var(--accent); background: var(--surface); }
+.recipe-title-combo input { border: 0 !important; background: transparent !important; border-radius: 0 !important; padding-left: 12px !important; box-shadow: none !important; }
+.emoji-button { width: 48px; height: 38px; border: 0; border-right: 1px solid var(--border); background: transparent; font-size: 23px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.emoji-button:hover, .emoji-button.active { background: transparent; }
+.emoji-picker { display: none; position: absolute; left: 0; top: calc(100% + 6px); width: 284px; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 18px 50px rgba(0,0,0,.18); z-index: 120; }
+.emoji-picker.open { display: block; }
+.emoji-search { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg); color: var(--text); font-family: 'Manrope', sans-serif; font-size: 13px; outline: none; margin-bottom: 8px; }
+.emoji-search:focus { border-color: var(--accent); background: var(--surface); }
+.emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; max-height: 184px; overflow-y: auto; }
+.emoji-option { width: 30px; height: 30px; border: 0; border-radius: 7px; background: transparent; font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .12s, transform .12s; }
+.emoji-option:hover { background: var(--bg); transform: scale(1.08); }
 #modal-detail-body { max-width: 820px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
 .detail-cols { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 .detail-left { width: 260px; flex-shrink: 0; border-right: 1px solid var(--border); padding: 18px 20px; overflow-y: auto; }
@@ -481,6 +573,7 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
   outline: none;
   transition: border-color .15s;
 }
+.fg select { padding-right: 34px; }
 .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); background: var(--surface); }
 .fg textarea { height: 80px; resize: vertical; }
 .seg-tabs { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); margin-bottom: 14px; }
@@ -491,12 +584,31 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .recipe-ai-row { display: flex; gap: 8px; align-items: flex-end; }
 .recipe-ai-row .fg { flex: 1; margin-bottom: 0; }
 .recipe-ai-status { display: none; font-size: 13px; color: var(--text-2); margin-top: 8px; }
+.recipe-chat { display: none; margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+.recipe-chat.show { display: block; }
+.recipe-chat-log { display: grid; gap: 6px; max-height: 130px; overflow-y: auto; margin-bottom: 8px; }
+.recipe-chat-msg { border-radius: 10px; padding: 7px 9px; font-size: 13px; line-height: 1.35; }
+.recipe-chat-msg.user { background: #E7F2FF; color: #075EA8; justify-self: end; max-width: 86%; }
+.recipe-chat-msg.ai { background: var(--surface); border: 1px solid var(--border); color: var(--text-2); justify-self: start; max-width: 86%; }
+[data-theme="dark"] .recipe-chat-msg.user { background: #17324A; color: #93C5FD; }
+.recipe-chat-row { display: flex; gap: 8px; align-items: center; }
+.recipe-chat-row input { flex: 1; min-width: 0; padding: 8px 11px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--text); font-family: 'Manrope', sans-serif; font-size: 13px; outline: none; }
+.recipe-chat-row input:focus { border-color: var(--accent); }
 .desc-tools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
 .desc-ai-status { display: none; font-size: 13px; color: var(--text-2); margin-top: 6px; }
+.detail-ai-empty { display: grid; gap: 10px; padding: 12px; border: 1px dashed var(--border); border-radius: var(--r); background: var(--bg); }
+.detail-ai-empty p { margin: 0; font-size: 13px; color: var(--text-3); line-height: 1.45; }
+.detail-ai-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.detail-ai-status { display: none; font-size: 13px; color: var(--text-2); }
+.settings-list { max-width: 720px; display: grid; gap: 14px; }
+.settings-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.settings-row:last-child { border-bottom: 0; }
+.settings-title { font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.settings-sub { font-size: 13px; color: var(--text-2); }
 .ingr-row { display: flex; gap: 6px; margin-bottom: 7px; align-items: center; }
 .ingr-row input { flex: 1; min-width: 0; }
 .ingr-row .ingr-qty { width: 60px; flex: none; }
-.ingr-row .ingr-unit { width: 90px; flex: none; padding: 9px 6px; font-size: 13px; }
+.ingr-row .ingr-unit { width: 90px; flex: none; padding: 9px 28px 9px 8px; font-size: 13px; }
 .ingr-rm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 20px; padding: 0 3px; transition: color .12s; }
 .ingr-rm:hover { color: var(--danger-t); }
 .modal-footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -513,6 +625,13 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .rsel-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
 .rsel-item:last-child { border-bottom: none; }
 .rsel-item:hover { background: var(--bg); }
+@media (max-width: 820px) {
+  .recipe-modal { max-width: 520px; }
+  .recipe-form-grid { grid-template-columns: 1fr; }
+  .recipe-form-right { border-left: 0; padding-left: 0; }
+  .recipe-form-right .fg textarea { height: 220px; min-height: 220px; }
+  .emoji-picker { width: min(320px, calc(100vw - 56px)); }
+}
 .rsel-item .ri-emoji { font-size: 22px; flex-shrink: 0; }
 .rsel-item .ri-info { flex: 1; min-width: 0; }
 .rsel-item .ri-name { font-size: 13px; font-weight: 600; }
@@ -647,6 +766,9 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
     </div>
     <div class="nav-right">
       <span class="nav-user" id="nav-user-name"></span>
+      <button class="nav-link" onclick="showPage('settings')" id="nl-settings" title="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.05V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.05-.33H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.05V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.36.35.69.6 1 .28.27.65.41 1.05.4H21a2 2 0 1 1 0 4h-.09c-.4-.01-.77.13-1.05.4-.25.31-.46.64-.6 1z"/></svg>
+      </button>
       <button class="btn-ghost btn-sm" onclick="signOut()">Выйти</button>
     </div>
   </nav>
@@ -709,13 +831,46 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
         Обновить
       </button>
     </div>
-    <div class="shop-date-range">
-      <label>Период:</label>
-      <input type="date" id="shop-from" onchange="shopFromDate=this.value;genShopping()">
-      <span class="sep">—</span>
-      <input type="date" id="shop-to" onchange="shopToDate=this.value;genShopping()">
+    <div class="shop-date-wrap" id="shop-date-wrap">
+      <div class="shop-date-range">
+        <label>Период:</label>
+        <input type="text" id="shop-from" readonly onclick="openShopDatePicker(event)" onfocus="openShopDatePicker(event)">
+        <span class="sep">—</span>
+        <input type="text" id="shop-to" readonly onclick="openShopDatePicker(event)" onfocus="openShopDatePicker(event)">
+        <span class="shop-period-pill" id="shop-period-pill">— дней</span>
+      </div>
+      <div class="shop-calendar-popover" id="shop-calendar-popover" onclick="event.stopPropagation()"></div>
     </div>
     <div id="shopping-content"></div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div class="page" id="page-settings">
+    <div class="page-header">
+      <h2>Настройки</h2>
+    </div>
+    <div class="settings-list">
+      <div class="settings-row">
+        <div>
+          <div class="settings-title">Тема</div>
+          <div class="settings-sub">Светлый или темный интерфейс</div>
+        </div>
+        <div class="seg-tabs" id="theme-tabs">
+          <button class="seg-tab" type="button" onclick="setAppTheme('light')">Светлая</button>
+          <button class="seg-tab" type="button" onclick="setAppTheme('dark')">Темная</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-title">Цвет блюд</div>
+          <div class="settings-sub">По приему пищи или по типу блюда</div>
+        </div>
+        <div class="seg-tabs" id="color-mode-tabs">
+          <button class="seg-tab" type="button" onclick="setDishColorMode('meal')">Категории</button>
+          <button class="seg-tab" type="button" onclick="setDishColorMode('food')">По типу</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -734,11 +889,10 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 
 <!-- MODAL: recipe form -->
 <div class="modal-overlay" id="modal-recipe">
-  <div class="modal">
-    <h3 id="modal-recipe-title">Новый рецепт</h3>
-    <div class="seg-tabs" id="recipe-mode-tabs">
-      <button class="seg-tab active" type="button" onclick="setRecipeMode('manual')">Вручную</button>
-      <button class="seg-tab" type="button" onclick="setRecipeMode('ai')">С ИИ</button>
+  <div class="modal recipe-modal">
+    <div class="recipe-modal-head">
+      <h3 id="modal-recipe-title">Новый рецепт</h3>
+      <button class="btn-ghost btn-sm" id="desc-ai-btn" type="button" onclick="generateDescriptionInForm()">✨ Сгенерировать рецепт</button>
     </div>
     <div class="recipe-ai-panel" id="recipe-ai-panel">
       <div class="recipe-ai-row">
@@ -749,36 +903,58 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
         <button class="btn-accent" id="recipe-ai-btn" type="button" onclick="generateRecipeInForm()">✨ Сгенерировать</button>
       </div>
       <div class="recipe-ai-status" id="recipe-ai-status"></div>
-    </div>
-    <div class="fg"><label>Эмодзи</label><input type="text" id="r-emoji" maxlength="4" placeholder="🍽️" style="width:70px"></div>
-    <div class="fg"><label>Название</label><input type="text" id="r-name" placeholder="Паста карбонара"></div>
-    <div class="fg"><label>Категория</label>
-      <select id="r-cat">
-        <option value="breakfast">Завтрак</option>
-        <option value="lunch">Обед</option>
-        <option value="dinner">Ужин</option>
-        <option value="snack">Перекус</option>
-        <option value="dessert">Десерт</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:12px">
-      <div class="fg" style="flex:1"><label>Время (мин)</label><input type="number" id="r-time" placeholder="30"></div>
-      <div class="fg" style="flex:1"><label>Порций</label><input type="number" id="r-servings" placeholder="2" min="1" max="20"></div>
-    </div>
-    <div class="fg">
-      <label>Ингредиенты</label>
-      <datalist id="ingredient-suggestions"></datalist>
-      <div id="ingr-list"></div>
-      <button class="btn-ghost btn-sm" onclick="addIngrRow()" style="margin-top:6px">+ Добавить ингредиент</button>
-    </div>
-    <div class="fg">
-      <label>Способ приготовления</label>
-      <div class="desc-tools">
-        <button class="btn-ghost btn-sm" id="desc-ai-btn" type="button" onclick="generateDescriptionInForm()">✨ Сгенерировать шаги</button>
-        <button class="btn-ghost btn-sm" id="desc-undo-btn" type="button" onclick="undoGeneratedDescription()" style="display:none">↶ Вернуть текст</button>
+      <div class="recipe-chat" id="recipe-chat">
+        <div class="recipe-chat-log" id="recipe-chat-log"></div>
+        <div class="recipe-chat-row">
+          <input type="text" id="recipe-chat-input" placeholder="Например: сделай без сливок, добавь овощей..." onkeydown="if(event.key==='Enter')sendRecipeChat()">
+          <button class="btn-ghost btn-sm" id="recipe-chat-btn" type="button" onclick="sendRecipeChat()">Отправить</button>
+        </div>
       </div>
-      <textarea id="r-desc" placeholder="Опишите шаги приготовления..."></textarea>
-      <div class="desc-ai-status" id="desc-ai-status"></div>
+    </div>
+    <div class="recipe-form-grid">
+      <div class="recipe-form-left">
+        <div class="fg">
+          <label>Название</label>
+          <div class="recipe-title-combo emoji-field">
+              <button class="emoji-button" id="emoji-button" type="button" onclick="toggleEmojiPicker(event)">🍽️</button>
+              <input type="text" id="r-emoji" maxlength="4" placeholder="🍽️" style="display:none" oninput="syncEmojiButton()">
+              <input type="text" id="r-name" placeholder="Паста карбонара">
+              <div class="emoji-picker" id="emoji-picker">
+                <input class="emoji-search" id="emoji-search" type="text" placeholder="Поиск эмодзи..." oninput="renderEmojiPicker()" onkeydown="if(event.key==='Escape')closeEmojiPicker()">
+                <div class="emoji-grid" id="emoji-grid"></div>
+              </div>
+          </div>
+        </div>
+        <div class="fg"><label>Категория</label>
+          <select id="r-cat">
+            <option value="breakfast">Завтрак</option>
+            <option value="lunch">Обед</option>
+            <option value="dinner">Ужин</option>
+            <option value="snack">Перекус</option>
+            <option value="dessert">Десерт</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="fg" style="flex:1"><label>Время (мин)</label><input type="number" id="r-time" placeholder="30"></div>
+          <div class="fg" style="flex:1"><label>Порций</label><input type="number" id="r-servings" placeholder="2" min="1" max="20"></div>
+        </div>
+        <div class="fg">
+          <label>Ингредиенты</label>
+          <datalist id="ingredient-suggestions"></datalist>
+          <div id="ingr-list"></div>
+          <button class="btn-ghost btn-sm" onclick="addIngrRow()" style="margin-top:6px">+ Добавить ингредиент</button>
+        </div>
+      </div>
+      <div class="recipe-form-right">
+        <div class="fg">
+          <label>Способ приготовления</label>
+          <div class="desc-tools">
+            <button class="btn-ghost btn-sm" id="desc-undo-btn" type="button" onclick="undoGeneratedDescription()" style="display:none">↶ Вернуть текст</button>
+          </div>
+          <textarea id="r-desc" placeholder="Опишите шаги приготовления..."></textarea>
+          <div class="desc-ai-status" id="desc-ai-status"></div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('modal-recipe')">Отмена</button>
@@ -875,14 +1051,23 @@ let filterCat = 'all'
 let shopFromDate = ''
 let shopToDate = ''
 let shopCatFilter = 'all'
+let shopPickerMonth = null
+let shopPickerDraftStart = ''
+let shopPickerHoverDate = ''
+let lastCookingAtMs = 0
 let editingId = null
 let addCtx = null
 let addCatFilter = 'all'
 let recipeFormMode = 'manual'
 let descUndoStack = []
+let recipeChatMessages = []
+let appTheme = localStorage.getItem('appTheme') || 'light'
+let dishColorMode = localStorage.getItem('dishColorMode') || 'meal'
 let viewMode = 'week'
 let weekOffset = 0
 let monthOffset = 0
+
+document.documentElement.dataset.theme = appTheme
 
 // ─── AUTH ───────────────────────────────────────────
 let authMode = 'login'
@@ -950,8 +1135,10 @@ document.addEventListener('mousemove', e => {
   if (!pointerMoveSpan) return
   if (Math.abs(e.clientX - pointerMoveSpan.startX) + Math.abs(e.clientY - pointerMoveSpan.startY) > 3) {
     pointerMoveSpan.moved = true
+    document.body.classList.add('dragging-active')
+    pointerMoveSpan.el?.classList.add('moving')
   }
-  markMoveTarget(e.clientX, e.clientY)
+  if (pointerMoveSpan.moved) markMoveTarget(e.clientX, e.clientY)
 })
 document.addEventListener('mouseup', async e => {
   if (!pointerResizeSpan) return
@@ -968,6 +1155,11 @@ document.addEventListener('mouseup', async e => {
   if (target && pointerMoveSpan.moved) {
     suppressChipClick = true
     await movePointerSpanTo(pointerMoveSpan, target.date, target.mealType)
+  } else if (!pointerMoveSpan.moved) {
+    suppressChipClick = true
+    document.querySelectorAll('.cal-chip.selected').forEach(c => c.classList.remove('selected'))
+    selectedSpanEntryIds = pointerMoveSpan.entryIds
+    pointerMoveSpan.el?.classList.add('selected')
   }
   clearPointerMove()
 })
@@ -984,6 +1176,9 @@ document.addEventListener('click', e => {
     selectedSpanEntryIds = null
     document.querySelectorAll('.cal-chip.selected').forEach(c => c.classList.remove('selected'))
   }
+  if (!e.target.closest('.emoji-field')) closeEmojiPicker()
+  const shopWrap = document.getElementById('shop-date-wrap')
+  if (shopWrap && !e.composedPath().includes(shopWrap)) closeShopDatePicker()
 })
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1019,6 +1214,7 @@ async function initApp(user) {
   renderRecipes()
   renderPlan()
   renderShopping()
+  renderSettings()
 }
 
 // ─── RECIPES ─────────────────────────────────────────
@@ -1055,6 +1251,84 @@ function renderIngredientSuggestions() {
   dl.innerHTML = items.map(i => `<option value="${escHtml(i.name)}"></option>`).join('')
 }
 
+const FOOD_TYPE_META = {
+  fish: { className: 'food-fish', tagClass: 'cat-food-fish', label: 'Рыба' },
+  meat: { className: 'food-meat', tagClass: 'cat-food-meat', label: 'Мясо' },
+  veggie: { className: 'food-veggie', tagClass: 'cat-food-veggie', label: 'Veggie' },
+  dessert: { className: 'food-dessert', tagClass: 'cat-dessert', label: 'Десерт' },
+  neutral: { className: 'food-neutral', tagClass: 'cat-food-neutral', label: 'Блюдо' },
+}
+
+const EMOJI_OPTIONS = [
+  ['🍽️','еда тарелка блюдо'], ['🥗','салат овощи veggie зелень'], ['🍝','паста спагетти макароны'], ['🍛','карри рис боул'], ['🍜','рамен суп лапша'], ['🍲','суп том ям борщ рагу'], ['🥘','паэлья сковорода горячее'], ['🍚','рис крупа гарнир'],
+  ['🍳','завтрак яйца омлет'], ['🥞','панкейки блины завтрак'], ['🧇','вафли завтрак'], ['🥣','каша овсянка боул'], ['🥪','сэндвич бутерброд'], ['🌮','тако мексика'], ['🌯','буррито ролл'], ['🍕','пицца'],
+  ['🍔','бургер мясо'], ['🥩','стейк мясо говядина'], ['🍗','курица мясо'], ['🥓','бекон мясо'], ['🐟','рыба'], ['🍣','суши рыба роллы'], ['🦐','креветки морепродукты'], ['🦑','кальмар морепродукты'],
+  ['🥦','брокколи овощи'], ['🥕','морковь овощи'], ['🍅','томат помидор овощи'], ['🥑','авокадо'], ['🍆','баклажан овощи'], ['🍄','грибы'], ['🫘','фасоль бобы нут'], ['🥔','картофель'],
+  ['🍰','торт десерт'], ['🍮','пудинг десерт'], ['🍨','мороженое десерт'], ['🍪','печенье десерт'], ['🥐','круассан выпечка'], ['🥖','хлеб багет'], ['🧀','сыр'], ['☕','кофе напиток']
+]
+
+function syncEmojiButton() {
+  const emoji = document.getElementById('r-emoji')?.value || '🍽️'
+  const btn = document.getElementById('emoji-button')
+  if (btn) btn.textContent = emoji
+}
+
+function toggleEmojiPicker(e) {
+  e.stopPropagation()
+  const picker = document.getElementById('emoji-picker')
+  const btn = document.getElementById('emoji-button')
+  picker.classList.toggle('open')
+  btn.classList.toggle('active', picker.classList.contains('open'))
+  renderEmojiPicker()
+  if (picker.classList.contains('open')) setTimeout(() => document.getElementById('emoji-search')?.focus(), 0)
+}
+
+function closeEmojiPicker() {
+  document.getElementById('emoji-picker')?.classList.remove('open')
+  document.getElementById('emoji-button')?.classList.remove('active')
+}
+
+function renderEmojiPicker() {
+  const grid = document.getElementById('emoji-grid')
+  if (!grid) return
+  const q = (document.getElementById('emoji-search')?.value || '').trim().toLowerCase()
+  const items = EMOJI_OPTIONS.filter(([emoji, words]) => !q || emoji.includes(q) || words.includes(q))
+  grid.innerHTML = (items.length ? items : EMOJI_OPTIONS).map(([emoji, words]) =>
+    `<button class="emoji-option" type="button" title="${escHtml(words)}" onclick="selectEmoji('${emoji}')">${emoji}</button>`
+  ).join('')
+}
+
+function selectEmoji(emoji) {
+  document.getElementById('r-emoji').value = emoji
+  syncEmojiButton()
+  closeEmojiPicker()
+  document.getElementById('r-name')?.focus()
+}
+
+function inferRecipeFoodType(r) {
+  if (r.category === 'dessert') return 'dessert'
+  const text = [r.name, ...(r.ingredients || []).map(i => i.name)].join(' ').toLowerCase()
+  if (/(рыб|лосос|семг|тунец|треск|кревет|морепродукт|кальмар|мидии|том.?ям)/.test(text)) return 'fish'
+  if (/(куриц|говядин|свинин|индейк|мяс|фарш|бекон|ветчин|колбас|сосиск|баранин|утк)/.test(text)) return 'meat'
+  if (/(овощ|тофу|нут|чечевиц|фасол|гриб|баклажан|кабач|цуккини|шпинат|салат|брокколи|капуст|картоф|морков|перец|томат|помидор|огурец|авокадо)/.test(text)) return 'veggie'
+  return 'neutral'
+}
+
+function recipeDisplayClass(r, mealKey = r.category) {
+  if (dishColorMode === 'food') return FOOD_TYPE_META[inferRecipeFoodType(r)].className
+  return mealKey
+}
+
+function recipeDisplayTagClass(r) {
+  if (dishColorMode === 'food') return FOOD_TYPE_META[inferRecipeFoodType(r)].tagClass
+  return `cat-${r.category}`
+}
+
+function recipeDisplayLabel(r) {
+  if (dishColorMode === 'food') return FOOD_TYPE_META[inferRecipeFoodType(r)].label
+  return CAT_LABELS[r.category] || r.category
+}
+
 function setFilter(cat) {
   filterCat = cat
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat))
@@ -1075,7 +1349,7 @@ function renderRecipes() {
       <div class="rc-emoji">${r.emoji || '🍽️'}</div>
       <div class="rc-name">${r.name}</div>
       <div class="rc-meta">
-        <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
+        <span class="cat-tag ${recipeDisplayTagClass(r)}">${recipeDisplayLabel(r)}</span>
         ${r.cook_time ? `<span class="rc-time">⏱ ${r.cook_time} мин</span>` : ''}
       </div>
     </div>`).join('')
@@ -1108,7 +1382,15 @@ function openDetail(id) {
 
   const descHtml = r.description
     ? `<div class="md-content">${marked.parse(r.description, { breaks: true })}</div>`
-    : `<p style="font-size:13px;color:var(--text-3)">Описание не добавлено</p>`
+    : `<div class="detail-ai-empty">
+        <p>Шаги пока не добавлены.</p>
+        <div class="detail-ai-actions">
+          <button class="btn-ghost btn-sm" id="detail-desc-ai-btn-${r.id}" type="button" onclick="generateSavedRecipeDescription(${r.id})">✨ Сгенерировать шаги</button>
+          <button class="btn-ghost btn-sm" id="detail-desc-file-btn-${r.id}" type="button" onclick="triggerRecipePhotoUpload(${r.id})">📎 Загрузить файл</button>
+          <input id="detail-desc-file-${r.id}" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" onchange="handleRecipePhotoUpload(event, ${r.id})">
+        </div>
+        <div class="detail-ai-status" id="detail-desc-ai-status-${r.id}"></div>
+      </div>`
 
   document.getElementById('modal-detail-body').innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);flex-shrink:0">
@@ -1117,7 +1399,7 @@ function openDetail(id) {
         <div style="min-width:0">
           <div style="font-size:17px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(r.name)}</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
+            <span class="cat-tag ${recipeDisplayTagClass(r)}">${recipeDisplayLabel(r)}</span>
             ${r.cook_time ? `<span style="font-size:12px;color:var(--text-2)">⏱ ${r.cook_time} мин</span>` : ''}
             ${r.servings ? `<span style="font-size:12px;color:var(--text-2)">👥 ${r.servings} чел.</span>` : ''}
           </div>
@@ -1202,7 +1484,15 @@ function openRecipeModal(id, mode = 'manual') {
   const aiBtn = document.getElementById('recipe-ai-btn')
   aiBtn.disabled = false
   aiBtn.textContent = '✨ Сгенерировать'
+  recipeChatMessages = []
+  renderRecipeChat()
+  document.getElementById('recipe-chat')?.classList.toggle('show', false)
+  document.getElementById('recipe-chat-input').value = ''
   document.getElementById('r-emoji').value = r?.emoji || '🍽️'
+  syncEmojiButton()
+  closeEmojiPicker()
+  document.getElementById('emoji-search').value = ''
+  renderEmojiPicker()
   document.getElementById('r-name').value = r?.name || ''
   document.getElementById('r-cat').value = r?.category || 'breakfast'
   document.getElementById('r-time').value = r?.cook_time || ''
@@ -1213,7 +1503,7 @@ function openRecipeModal(id, mode = 'manual') {
   document.getElementById('desc-ai-status').style.display = 'none'
   const descBtn = document.getElementById('desc-ai-btn')
   descBtn.disabled = false
-  descBtn.textContent = '✨ Сгенерировать шаги'
+  descBtn.textContent = '✨ Сгенерировать рецепт'
   const il = document.getElementById('ingr-list')
   il.innerHTML = ''
   const ingrs = r?.ingredients?.length ? r.ingredients : [{ name: '', amount: '' }]
@@ -1359,6 +1649,30 @@ function navPeriod(dir) {
 }
 function goToday() { weekOffset = 0; monthOffset = 0; renderPlan() }
 
+function renderSettings() {
+  document.querySelectorAll('#theme-tabs .seg-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && appTheme === 'light') || (i === 1 && appTheme === 'dark'))
+  })
+  document.querySelectorAll('#color-mode-tabs .seg-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && dishColorMode === 'meal') || (i === 1 && dishColorMode === 'food'))
+  })
+}
+
+function setAppTheme(theme) {
+  appTheme = theme
+  localStorage.setItem('appTheme', theme)
+  document.documentElement.dataset.theme = theme
+  renderSettings()
+}
+
+function setDishColorMode(mode) {
+  dishColorMode = mode
+  localStorage.setItem('dishColorMode', mode)
+  renderSettings()
+  renderRecipes()
+  renderPlan()
+}
+
 function getEntriesForDay(dk) {
   return planEntries.filter(e => e.date === dk)
 }
@@ -1449,12 +1763,9 @@ function onChipMouseDown(e, span) {
   e.preventDefault()
   e.stopPropagation()
   if (!side) {
-    pointerMoveSpan = { ...span, moved: false, startX: e.clientX, startY: e.clientY }
+    pointerMoveSpan = { ...span, moved: false, startX: e.clientX, startY: e.clientY, el: e.currentTarget }
     if (span.entryIds.length === 1) calDragEntryId = span.entryIds[0]
     else calDragSpan = pointerMoveSpan
-    document.body.classList.add('dragging-active')
-    e.currentTarget.classList.add('moving')
-    markMoveTarget(e.clientX, e.clientY)
     return
   }
   pointerResizeSpan = { ...span, side, moved: false, startX: e.clientX, startY: e.clientY }
@@ -1524,7 +1835,7 @@ async function onDropZoneDrop(e, date, mealType) {
     calDragEntryId = null
   } else if (calDragRecipeId) {
     const { data, error } = await sb.from('plan_entries').insert({
-      date, meal_type: mealType, recipe_id: calDragRecipeId, user_id: currentUser.id
+      date, meal_type: mealType, recipe_id: calDragRecipeId, user_id: currentUser.id, created_at: newCookingAt()
     }).select().single()
     if (!error && data) { planEntries.push(data); renderPlan() }
     calDragRecipeId = null
@@ -1558,11 +1869,28 @@ function hasPlanEntry(dk, mealType, recipeId, excludeIds = []) {
   )
 }
 
-async function insertPlanDates(recipeId, mealType, dates, excludeIds = []) {
+function newCookingAt() {
+  lastCookingAtMs = Math.max(Date.now(), lastCookingAtMs + 1)
+  return new Date(lastCookingAtMs).toISOString()
+}
+
+function cookingKey(entry) {
+  return entry.created_at || `entry-${entry.id}`
+}
+
+function writeableCookingAt(value) {
+  return value && !String(value).startsWith('entry-') ? value : newCookingAt()
+}
+
+function spanGroupKey(entry) {
+  return `${entry.recipe_id}:${entry.meal_type}:${cookingKey(entry)}`
+}
+
+async function insertPlanDates(recipeId, mealType, dates, excludeIds = [], cookingAt = newCookingAt()) {
   const uniqueDates = [...new Set(dates)]
     .filter(dk => !hasPlanEntry(dk, mealType, recipeId, excludeIds))
   if (!uniqueDates.length) return []
-  const rows = uniqueDates.map(d => ({ date: d, meal_type: mealType, recipe_id: recipeId, user_id: currentUser.id }))
+  const rows = uniqueDates.map(d => ({ date: d, meal_type: mealType, recipe_id: recipeId, user_id: currentUser.id, created_at: cookingAt }))
   const { data, error } = await sb.from('plan_entries').insert(rows).select()
   if (error) { toast('Не удалось обновить план'); return null }
   return data || []
@@ -1575,8 +1903,8 @@ async function deletePlanIds(entryIds) {
   return true
 }
 
-async function replaceEntries(entryIds, recipeId, mealType, dates) {
-  const inserted = await insertPlanDates(recipeId, mealType, dates, entryIds)
+async function replaceEntries(entryIds, recipeId, mealType, dates, cookingAt = newCookingAt()) {
+  const inserted = await insertPlanDates(recipeId, mealType, dates, entryIds, cookingAt)
   if (inserted === null) return
   const deleted = await deletePlanIds(entryIds)
   if (!deleted) { await loadPlan(); renderPlan(); return }
@@ -1589,14 +1917,14 @@ async function replaceEntries(entryIds, recipeId, mealType, dates) {
 async function moveSingleEntryTo(entryId, date, mealType) {
   const entry = planEntries.find(x => x.id === entryId)
   if (!entry) return
-  await replaceEntries([entryId], entry.recipe_id, mealType, [date])
+  await replaceEntries([entryId], entry.recipe_id, mealType, [date], writeableCookingAt(cookingKey(entry)))
 }
 
 async function moveSpanTo(date, mealType) {
   if (!calDragSpan) return
   const len = spanLength(calDragSpan.startDate, calDragSpan.endDate)
   const dates = Array.from({ length: len }, (_, i) => addDaysToKey(date, i))
-  await replaceEntries(calDragSpan.entryIds, calDragSpan.recipeId, mealType, dates)
+  await replaceEntries(calDragSpan.entryIds, calDragSpan.recipeId, mealType, dates, writeableCookingAt(calDragSpan.cookingAt))
 }
 
 function canResizeSpanTo(date, mealType) {
@@ -1612,29 +1940,21 @@ async function resizeSpanTo(date, mealType) {
   const nextStart = span.side === 'left' ? date : span.startDate
   const nextEnd = span.side === 'right' ? date : span.endDate
   const nextDates = datesInRange(nextStart, nextEnd)
-  const keepDates = datesInRange(span.startDate, span.endDate)
-  const removeIds = span.entryIds.filter((id, i) => !nextDates.includes(keepDates[i]))
-  const addDates = nextDates.filter(dk => !keepDates.includes(dk))
-  const inserted = await insertPlanDates(span.recipeId, span.mealType, addDates, span.entryIds)
-  if (inserted === null) return
-  const deleted = await deletePlanIds(removeIds)
-  if (!deleted) { await loadPlan(); renderPlan(); return }
-  planEntries = planEntries.filter(x => !removeIds.includes(x.id))
-  planEntries.push(...inserted)
-  selectedSpanEntryIds = null
-  renderPlan()
+  await replaceEntries(span.entryIds, span.recipeId, span.mealType, nextDates, writeableCookingAt(span.cookingAt))
 }
 
 function getChipSpans(weekEntries, days, mealType) {
   const dayKeys = days.map(d => dateKey(d))
   const spans = []
-  const byRecipe = {}
+  const bySpan = {}
   weekEntries.filter(e => e.meal_type === mealType).forEach(e => {
-    if (!byRecipe[e.recipe_id]) byRecipe[e.recipe_id] = []
-    byRecipe[e.recipe_id].push(e)
+    const key = spanGroupKey(e)
+    if (!bySpan[key]) bySpan[key] = []
+    bySpan[key].push(e)
   })
-  Object.entries(byRecipe).forEach(([ridStr, rEntries]) => {
-    const rid = +ridStr
+  Object.values(bySpan).forEach(rEntries => {
+    const rid = rEntries[0]?.recipe_id
+    const cookingAt = cookingKey(rEntries[0])
     const dayIdxs = []
     dayKeys.forEach((dk, i) => { if (rEntries.some(e => e.date === dk)) dayIdxs.push(i) })
     let i = 0
@@ -1647,7 +1967,7 @@ function getChipSpans(weekEntries, days, mealType) {
       while (i + 1 < dayIdxs.length && dayIdxs[i + 1] === dayIdxs[i] + 1) {
         i++; spanEnd = dayIdxs[i]; addE(spanEnd)
       }
-      spans.push({ rid, startIdx: spanStart, endIdx: spanEnd, spanEntryIds, startDate: dayKeys[spanStart], endDate: dayKeys[spanEnd] })
+      spans.push({ rid, cookingAt, startIdx: spanStart, endIdx: spanEnd, spanEntryIds, startDate: dayKeys[spanStart], endDate: dayKeys[spanEnd] })
       i++
     }
   })
@@ -1684,9 +2004,9 @@ function renderPalette() {
   el.innerHTML = catOrder.filter(c => grouped[c]?.length).map(cat => `
     <div class="palette-group">
       <div class="palette-group-title">${CAT_LABELS[cat] || cat}</div>
-      <div class="palette-chips">
+          <div class="palette-chips">
         ${grouped[cat].map(r => `
-          <div class="palette-chip ${cat}" draggable="true"
+          <div class="palette-chip ${recipeDisplayClass(r, cat)}" draggable="true"
             ondragstart="onPaletteDragStart(event,${r.id})"
             ondragend="onCalDragEnd(event)">
             ${r.emoji || '🍽️'} ${escHtml(r.name)}
@@ -1751,7 +2071,7 @@ function renderWeek() {
                 endDate: span.endDate,
               })
               const isPastSpan = span.endDate < today
-              return `<div class="cal-chip ${mt.key}${isPastSpan ? ' past-chip' : ''}"
+              return `<div class="cal-chip ${recipeDisplayClass(r, mt.key)}${isPastSpan ? ' past-chip' : ''}"
                 style="grid-column:${span.startIdx + 1}/${span.endIdx + 2}"
                 draggable="false"
                 onmousedown='onChipMouseDown(event,${spanData})'
@@ -1789,7 +2109,7 @@ function renderMonth() {
           const meals = entries.filter(e => e.meal_type === mt.key)
           return meals.slice(0, 2).map(e => {
             const r = recipes.find(x => x.id === e.recipe_id)
-            return r ? `<div class="month-dot ${mt.key}" title="${r.name}">${r.emoji || '🍽️'} ${r.name}</div>` : ''
+            return r ? `<div class="month-dot ${recipeDisplayClass(r, mt.key)}" title="${r.name}">${r.emoji || '🍽️'} ${r.name}</div>` : ''
           }).join('')
         }).join('')}
         <button class="month-add-btn" onclick="openAddModal('${dk}','breakfast','Завтрак',${day},'${RU_MONTHS_GEN[d.getMonth()]}')">+</button>
@@ -1855,7 +2175,8 @@ async function addMealToPlan(recipe_id) {
     date: dk,
     meal_type: mealKey,
     recipe_id,
-    user_id: currentUser.id
+    user_id: currentUser.id,
+    created_at: newCookingAt()
   }).select().single()
   if (!error) {
     planEntries.push(data)
@@ -1900,17 +2221,190 @@ function initShopDates() {
   shopToDate = dateKey(addDays(start, 6))
 }
 
+function formatShopDate(dk) {
+  if (!dk) return ''
+  const d = new Date(dk + 'T00:00:00')
+  return `${d.getDate()} ${RU_MONTHS_GEN[d.getMonth()]}`
+}
+
+function syncShopDateInputs() {
+  const fromEl = document.getElementById('shop-from')
+  const toEl = document.getElementById('shop-to')
+  if (fromEl) fromEl.value = formatShopDate(shopFromDate)
+  if (toEl) toEl.value = formatShopDate(shopToDate)
+  updateShopPeriodPill()
+}
+
+function daysBetweenInclusive(a, b) {
+  if (!a || !b) return 0
+  const start = new Date((a <= b ? a : b) + 'T00:00:00')
+  const end = new Date((a <= b ? b : a) + 'T00:00:00')
+  return Math.round((end - start) / 86400000) + 1
+}
+
+function formatDaysLabel(days) {
+  if (!days) return '— дней'
+  const mod10 = days % 10, mod100 = days % 100
+  const word = mod10 === 1 && mod100 !== 11 ? 'день' : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? 'дня' : 'дней'
+  return `${days} ${word}`
+}
+
+function updateShopPeriodPill(days = null) {
+  const el = document.getElementById('shop-period-pill')
+  if (!el) return
+  const count = days ?? daysBetweenInclusive(shopFromDate, shopToDate)
+  el.textContent = formatDaysLabel(count)
+}
+
+function openShopDatePicker(e) {
+  e?.stopPropagation()
+  if (!shopFromDate || !shopToDate) initShopDates()
+  const popover = document.getElementById('shop-calendar-popover')
+  const wasOpen = popover?.classList.contains('open')
+  if (!wasOpen) {
+    shopPickerDraftStart = ''
+    shopPickerHoverDate = ''
+  }
+  if (!shopPickerMonth) {
+    const base = new Date((shopFromDate || todayKey()) + 'T00:00:00')
+    shopPickerMonth = new Date(base.getFullYear(), base.getMonth(), 1)
+  }
+  renderShopDatePicker()
+  popover?.classList.add('open')
+}
+
+function closeShopDatePicker() {
+  document.getElementById('shop-calendar-popover')?.classList.remove('open')
+  shopPickerDraftStart = ''
+  shopPickerHoverDate = ''
+  updateShopPeriodPill()
+}
+
+function navShopPickerMonth(dir, e) {
+  e?.stopPropagation()
+  if (!shopPickerMonth) shopPickerMonth = currentMonthDate()
+  shopPickerMonth = new Date(shopPickerMonth.getFullYear(), shopPickerMonth.getMonth() + dir, 1)
+  renderShopDatePicker()
+}
+
+function selectShopDate(dk, e) {
+  e?.stopPropagation()
+  if (!shopPickerDraftStart) {
+    shopPickerDraftStart = dk
+    shopPickerHoverDate = ''
+    shopFromDate = dk
+    shopToDate = ''
+    syncShopDateInputs()
+    updateShopPeriodPill(1)
+    renderShopDatePicker()
+    return
+  }
+  const a = shopPickerDraftStart
+  shopFromDate = a <= dk ? a : dk
+  shopToDate = a <= dk ? dk : a
+  shopPickerDraftStart = ''
+  shopPickerHoverDate = ''
+  syncShopDateInputs()
+  closeShopDatePicker()
+  genShopping()
+}
+
+function hoverShopDate(dk) {
+  if (!shopPickerDraftStart) return
+  shopPickerHoverDate = dk
+  updateShopPeriodPill(daysBetweenInclusive(shopPickerDraftStart, dk))
+  updateShopDatePickerClasses()
+}
+
+function updateShopDatePickerClasses() {
+  const selectedStart = shopPickerDraftStart
+  const selectedEnd = shopPickerDraftStart ? (shopPickerHoverDate || shopPickerDraftStart) : ''
+  const rangeStart = selectedStart && selectedEnd ? (selectedStart <= selectedEnd ? selectedStart : selectedEnd) : ''
+  const rangeEnd = selectedStart && selectedEnd ? (selectedStart <= selectedEnd ? selectedEnd : selectedStart) : ''
+  document.querySelectorAll('.shop-cal-day[data-date]').forEach(btn => {
+    const dk = btn.dataset.date
+    btn.classList.toggle('start', dk === selectedStart)
+    btn.classList.toggle('end', dk === selectedEnd)
+    btn.classList.toggle('in-range', !!rangeStart && !!rangeEnd && dk > rangeStart && dk < rangeEnd)
+  })
+}
+
+function renderShopDatePicker() {
+  const el = document.getElementById('shop-calendar-popover')
+  if (!el) return
+  const base = shopPickerMonth || currentMonthDate()
+  const months = [base, new Date(base.getFullYear(), base.getMonth() + 1, 1)]
+  const selectedStart = shopPickerDraftStart
+  const selectedEnd = shopPickerDraftStart ? (shopPickerHoverDate || shopPickerDraftStart) : ''
+  const rangeStart = selectedStart && selectedEnd ? (selectedStart <= selectedEnd ? selectedStart : selectedEnd) : ''
+  const rangeEnd = selectedStart && selectedEnd ? (selectedStart <= selectedEnd ? selectedEnd : selectedStart) : ''
+  el.innerHTML = `
+    <div class="shop-cal-head">
+      <button class="shop-cal-nav" type="button" onclick="navShopPickerMonth(-1, event)">‹</button>
+      <div class="shop-cal-hint">${shopPickerDraftStart ? 'Выбери дату окончания' : 'Выбери период покупок'}</div>
+      <button class="shop-cal-nav" type="button" onclick="navShopPickerMonth(1, event)">›</button>
+    </div>
+    <div class="shop-cal-months">
+      ${months.map(m => renderShopMonth(m, selectedStart, selectedEnd, rangeStart, rangeEnd)).join('')}
+    </div>`
+}
+
+function renderShopMonth(monthDate, selectedStart, selectedEnd, rangeStart, rangeEnd) {
+  const firstDay = (monthDate.getDay() || 7) - 1
+  const daysInMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0).getDate()
+  const cells = []
+  for (let i = 0; i < firstDay; i++) cells.push('<button class="shop-cal-day muted" type="button"></button>')
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dk = dateKey(new Date(monthDate.getFullYear(), monthDate.getMonth(), day))
+    const isStart = dk === selectedStart
+    const isEnd = dk === selectedEnd
+    const inRange = rangeStart && rangeEnd && dk > rangeStart && dk < rangeEnd
+    cells.push(`<button class="shop-cal-day${isStart ? ' start' : ''}${isEnd ? ' end' : ''}${inRange ? ' in-range' : ''}" type="button" data-date="${dk}" onmouseenter="hoverShopDate('${dk}')" onclick="selectShopDate('${dk}', event)">${day}</button>`)
+  }
+  return `<div class="shop-cal-month">
+    <div class="shop-cal-title">${RU_MONTHS_FULL[monthDate.getMonth()]} ${monthDate.getFullYear()}</div>
+    <div class="shop-cal-week">${RU_DAYS.map(d => `<span>${d}</span>`).join('')}</div>
+    <div class="shop-cal-grid">${cells.join('')}</div>
+  </div>`
+}
+
+function isNextDate(prevDate, date) {
+  return addDaysToKey(prevDate, 1) === date
+}
+
+function getShoppingCookEntries(entries) {
+  const sorted = [...entries].sort((a, b) =>
+    a.recipe_id - b.recipe_id ||
+    String(a.meal_type).localeCompare(String(b.meal_type)) ||
+    String(a.date).localeCompare(String(b.date)) ||
+    String(a.created_at || '').localeCompare(String(b.created_at || '')) ||
+    a.id - b.id
+  )
+  const cookEntries = []
+  let prev = null
+  sorted.forEach(e => {
+    const sameVisualSpan = prev &&
+      prev.recipe_id === e.recipe_id &&
+      prev.meal_type === e.meal_type &&
+      cookingKey(prev) === cookingKey(e) &&
+      isNextDate(prev.date, e.date)
+    if (!sameVisualSpan) cookEntries.push(e)
+    prev = e
+  })
+  return cookEntries
+}
+
 async function genShopping() {
   if (!shopFromDate || !shopToDate) initShopDates()
   const fromEl = document.getElementById('shop-from')
   const toEl = document.getElementById('shop-to')
-  if (fromEl) fromEl.value = shopFromDate
-  if (toEl) toEl.value = shopToDate
+  syncShopDateInputs()
 
   const prev = shopping
   const all = {}
   const filtered = planEntries.filter(e => e.date >= shopFromDate && e.date <= shopToDate)
-  filtered.forEach(e => {
+  const cookEntries = getShoppingCookEntries(filtered)
+  cookEntries.forEach(e => {
     const r = recipes.find(x => x.id === e.recipe_id)
     if (!r) return
     ;(r.ingredients || []).forEach(i => {
@@ -1938,10 +2432,7 @@ function renderShopping() {
   const el = document.getElementById('shopping-content')
   // sync date inputs
   if (shopFromDate || shopToDate) {
-    const fromEl = document.getElementById('shop-from')
-    const toEl = document.getElementById('shop-to')
-    if (fromEl && shopFromDate) fromEl.value = shopFromDate
-    if (toEl && shopToDate) toEl.value = shopToDate
+    syncShopDateInputs()
   }
 
   const allItems = Object.values(shopping)
@@ -1949,6 +2440,7 @@ function renderShopping() {
   const periodEntries = (shopFromDate && shopToDate)
     ? planEntries.filter(e => e.date >= shopFromDate && e.date <= shopToDate)
     : planEntries
+  const periodCookEntries = getShoppingCookEntries(periodEntries)
   const checked = allItems.filter(i => i.checked).length
 
   if (!allItems.length) {
@@ -1972,7 +2464,7 @@ function renderShopping() {
   el.innerHTML = `
     <div class="shop-stats">
       <div class="stat-card"><div class="stat-num">${allItems.length}</div><div class="stat-lbl">позиций</div></div>
-      <div class="stat-card"><div class="stat-num">${periodEntries.length}</div><div class="stat-lbl">блюд</div></div>
+      <div class="stat-card"><div class="stat-num">${periodCookEntries.length}</div><div class="stat-lbl">готовок</div></div>
       <div class="stat-card"><div class="stat-num">${checked}/${allItems.length}</div><div class="stat-lbl">куплено</div></div>
     </div>
     <div class="shop-filters">
@@ -2109,22 +2601,178 @@ function getRecipeFormIngredients() {
   }).filter(i => i.name)
 }
 
-async function fetchRecipeDescriptionAI() {
-  const name = document.getElementById('r-name').value.trim()
-  if (!name) throw new Error('Missing name')
-  const recipe = {
+function getRecipeFormSnapshot() {
+  return {
+    name: document.getElementById('r-name').value.trim(),
+    emoji: document.getElementById('r-emoji').value || '🍽️',
     category: document.getElementById('r-cat').value,
     cook_time: parseInt(document.getElementById('r-time').value) || null,
     servings: parseInt(document.getElementById('r-servings').value) || 2,
+    description: document.getElementById('r-desc').value.trim(),
     ingredients: getRecipeFormIngredients()
   }
+}
+
+async function fetchRecipeDescriptionAI(image = null) {
+  const name = document.getElementById('r-name').value.trim()
+  if (!name) throw new Error('Missing name')
+  const recipe = getRecipeFormSnapshot()
   const res = await fetch('/.netlify/functions/recipe-ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, mode: 'description', recipe })
+    body: JSON.stringify({ name, mode: 'description', recipe, image })
   })
   if (!res.ok) throw new Error('API error')
   return await res.json()
+}
+
+function getSavedRecipeSnapshot(recipe) {
+  return {
+    name: recipe.name,
+    emoji: recipe.emoji || '🍽️',
+    category: recipe.category,
+    cook_time: recipe.cook_time || null,
+    servings: recipe.servings || 2,
+    description: recipe.description || '',
+    ingredients: recipe.ingredients || []
+  }
+}
+
+async function fetchSavedRecipeDescriptionAI(recipe, image = null) {
+  const res = await fetch('/.netlify/functions/recipe-ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: recipe.name,
+      mode: 'description',
+      recipe: getSavedRecipeSnapshot(recipe),
+      image
+    })
+  })
+  if (!res.ok) throw new Error('API error')
+  return await res.json()
+}
+
+function setDetailAiStatus(id, text, show = true) {
+  const status = document.getElementById(`detail-desc-ai-status-${id}`)
+  if (!status) return
+  status.style.display = show ? 'block' : 'none'
+  status.textContent = text
+}
+
+function setDetailAiBusy(id, busy) {
+  const genBtn = document.getElementById(`detail-desc-ai-btn-${id}`)
+  const fileBtn = document.getElementById(`detail-desc-file-btn-${id}`)
+  if (genBtn) {
+    genBtn.disabled = busy
+    genBtn.textContent = busy ? 'Генерируем...' : '✨ Сгенерировать шаги'
+  }
+  if (fileBtn) fileBtn.disabled = busy
+}
+
+async function generateSavedRecipeDescription(id, image = null) {
+  const recipe = recipes.find(x => x.id === id)
+  if (!recipe) return
+  setDetailAiBusy(id, true)
+  setDetailAiStatus(id, image ? 'ИИ читает файл и собирает шаги...' : 'ИИ пишет шаги по названию и ингредиентам...')
+  try {
+    const data = await fetchSavedRecipeDescriptionAI(recipe, image)
+    const description = data.description || ''
+    if (!description) throw new Error('Empty description')
+    const { error } = await sb.from('recipes').update({ description }).eq('id', id)
+    if (error) throw error
+    recipe.description = description
+    renderRecipes()
+    openDetail(id)
+    toast(image ? 'Шаги добавлены из файла' : 'Шаги сгенерированы')
+  } catch {
+    setDetailAiStatus(id, 'Не получилось добавить шаги. Попробуй ещё раз или загрузи другое изображение.')
+  } finally {
+    setDetailAiBusy(id, false)
+  }
+}
+
+function triggerRecipePhotoUpload(id) {
+  document.getElementById(`detail-desc-file-${id}`)?.click()
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+async function handleRecipePhotoUpload(event, id) {
+  const input = event.target
+  const file = input.files?.[0]
+  input.value = ''
+  if (!file) return
+  const supported = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  if (!supported.includes(file.type)) {
+    toast('Поддерживаются JPG, PNG, WebP или GIF')
+    return
+  }
+  try {
+    const dataUrl = await readFileAsDataUrl(file)
+    const data = String(dataUrl).split(',')[1]
+    await generateSavedRecipeDescription(id, { mediaType: file.type, data })
+  } catch {
+    setDetailAiStatus(id, 'Не удалось прочитать файл. Попробуй другое изображение.')
+  }
+}
+
+async function fetchRecipeRefineAI(instruction) {
+  const recipe = getRecipeFormSnapshot()
+  if (!recipe.name) throw new Error('Missing name')
+  const res = await fetch('/.netlify/functions/recipe-ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: recipe.name, mode: 'refine', recipe, instruction })
+  })
+  if (!res.ok) throw new Error('API error')
+  return await res.json()
+}
+
+function renderRecipeChat() {
+  const log = document.getElementById('recipe-chat-log')
+  if (!log) return
+  log.innerHTML = recipeChatMessages.map(m =>
+    `<div class="recipe-chat-msg ${m.role}">${escHtml(m.text)}</div>`
+  ).join('')
+  log.scrollTop = log.scrollHeight
+}
+
+function showRecipeChat() {
+  document.getElementById('recipe-chat')?.classList.add('show')
+}
+
+async function sendRecipeChat() {
+  const input = document.getElementById('recipe-chat-input')
+  const btn = document.getElementById('recipe-chat-btn')
+  const text = input.value.trim()
+  if (!text) return
+  if (!document.getElementById('r-name').value.trim()) { toast('Сначала нужен рецепт или название'); return }
+  recipeChatMessages.push({ role: 'user', text })
+  recipeChatMessages.push({ role: 'ai', text: 'Обновляю рецепт...' })
+  renderRecipeChat()
+  input.value = ''
+  btn.disabled = true
+  try {
+    const recipe = await fetchRecipeRefineAI(text)
+    recipeChatMessages[recipeChatMessages.length - 1] = { role: 'ai', text: 'Готово, внесла правки в форму.' }
+    applyRecipeToForm(recipe, document.getElementById('r-name').value.trim(), { focusName: false })
+    showRecipeChat()
+    renderRecipeChat()
+    input.focus()
+  } catch {
+    recipeChatMessages[recipeChatMessages.length - 1] = { role: 'ai', text: 'Не получилось применить правки. Попробуй сформулировать иначе.' }
+    renderRecipeChat()
+  } finally {
+    btn.disabled = false
+  }
 }
 
 async function generateDescriptionInForm() {
@@ -2150,7 +2798,7 @@ async function generateDescriptionInForm() {
     status.textContent = 'Не удалось сгенерировать шаги. Попробуй ещё раз.'
   } finally {
     btn.disabled = false
-    btn.textContent = '✨ Сгенерировать ещё'
+    btn.textContent = '✨ Сгенерировать рецепт'
   }
 }
 
@@ -2162,9 +2810,10 @@ function undoGeneratedDescription() {
   document.getElementById('desc-ai-status').textContent = 'Вернули предыдущую версию текста.'
 }
 
-function applyRecipeToForm(recipe, fallbackName = '') {
+function applyRecipeToForm(recipe, fallbackName = '', opts = {}) {
   document.getElementById('r-name').value = recipe.name || fallbackName
   document.getElementById('r-emoji').value = recipe.emoji || '🍽️'
+  syncEmojiButton()
   document.getElementById('r-cat').value = recipe.category || 'lunch'
   document.getElementById('r-time').value = recipe.cook_time || ''
   document.getElementById('r-servings').value = recipe.servings || 2
@@ -2173,7 +2822,7 @@ function applyRecipeToForm(recipe, fallbackName = '') {
   il.innerHTML = ''
   const ingredients = recipe.ingredients?.length ? recipe.ingredients : [{ name: '', amount: '' }]
   ingredients.forEach(i => addIngrRow(i.name, i.amount))
-  document.getElementById('r-name').focus()
+  if (opts.focusName !== false) document.getElementById('r-name').focus()
 }
 
 async function generateRecipeInForm() {
@@ -2189,6 +2838,9 @@ async function generateRecipeInForm() {
   try {
     const recipe = await fetchRecipeAI(name)
     applyRecipeToForm(recipe, name)
+    recipeChatMessages = [{ role: 'ai', text: 'Рецепт готов. Можно написать, что поменять.' }]
+    renderRecipeChat()
+    showRecipeChat()
     status.textContent = 'Готово. Проверь рецепт и сохрани.'
     toast('Рецепт сгенерирован')
   } catch {
@@ -2229,6 +2881,7 @@ function showPage(p) {
   document.getElementById('nl-' + p).classList.add('active')
   if (p === 'plan') renderPlan()
   if (p === 'shopping') renderShopping()
+  if (p === 'settings') renderSettings()
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open') }
