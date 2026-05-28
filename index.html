@@ -329,6 +329,11 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .palette-chip.snack { background: var(--snack); color: var(--snack-t); }
 .palette-chip.dessert { background: var(--dessert); color: var(--dessert-t); }
 .cal-cell.today-col { background: rgba(45,106,79,.04); }
+.cal-cell.past-col { opacity: 0.45; }
+.cal-cell.past-col .cal-add-btn { display: none; }
+.cal-day-head.past .cal-day-num { color: var(--text-3); }
+.cal-day-head.past .cal-day-name { opacity: 0.5; }
+.cal-chip.past-chip { opacity: 0.4; filter: grayscale(0.6); }
 .cal-cell.drag-over { background: var(--accent-light) !important; outline: 2px solid var(--accent); outline-offset: -2px; }
 .cal-chip { border-radius: 5px; padding: 4px 6px; font-size: 11px; font-weight: 500; cursor: grab; display: flex; align-items: center; gap: 4px; user-select: none; transition: opacity .15s; }
 .cal-chip:active { cursor: grabbing; }
@@ -414,6 +419,15 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .shop-add-row { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
 .shop-add-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r); font-family: 'Manrope', sans-serif; font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border-color .15s; }
 .shop-add-row input:focus { border-color: var(--accent); }
+.shop-date-range { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.shop-date-range label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-3); white-space: nowrap; }
+.shop-date-range input[type=date] { border: 1px solid var(--border); border-radius: var(--r); padding: 6px 10px; font-family: 'Manrope', sans-serif; font-size: 13px; background: var(--surface); color: var(--text); outline: none; transition: border-color .15s; }
+.shop-date-range input[type=date]:focus { border-color: var(--accent); }
+.shop-date-range .sep { color: var(--text-3); }
+.shop-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.shop-filter-chip { padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-2); cursor: pointer; transition: all .12s; white-space: nowrap; }
+.shop-filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.shop-filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* ── MODAL ── */
 .modal-overlay {
@@ -666,8 +680,14 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
       <h2>Список покупок</h2>
       <button class="btn-accent" onclick="genShopping()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-        Обновить из плана
+        Обновить
       </button>
+    </div>
+    <div class="shop-date-range">
+      <label>Период:</label>
+      <input type="date" id="shop-from" onchange="shopFromDate=this.value;genShopping()">
+      <span class="sep">—</span>
+      <input type="date" id="shop-to" onchange="shopToDate=this.value;genShopping()">
     </div>
     <div id="shopping-content"></div>
   </div>
@@ -772,6 +792,26 @@ const MEAL_TYPES = [
   { key: 'snack',     label: 'Перекус' }
 ]
 const CAT_LABELS = { breakfast: 'Завтрак', lunch: 'Обед', dinner: 'Ужин', snack: 'Перекус', dessert: 'Десерт' }
+const SHOP_CATS = {
+  meat:    { label: 'Мясо и рыба', keywords: ['курица','говядин','свинин','рыб','лосос','тунец','мясо','фарш','колбас','сосиск','креветк','индейк','баранин','семг','треска','сельд','скумбри','утка','телятин'] },
+  dairy:   { label: 'Молочные',    keywords: ['сыр','молок','сметан','кефир','творог','йогурт','сливочн','сливки','пармезан','моцарел','рикотт','брынза','ряженк'] },
+  eggs:    { label: 'Яйца',        keywords: ['яйц'] },
+  veg:     { label: 'Овощи',       keywords: ['помидор','томат','огурец','морков','картофел','лук','перец','капуст','брокколи','кабачок','баклажан','цуккини','шпинат','салат','чеснок','свекл','тыкв','гриб','сельдерей','петрушк','укроп','кинза','зелен'] },
+  fruits:  { label: 'Фрукты',      keywords: ['яблок','банан','апельсин','лимон','мандарин','виноград','клубник','малин','черник','персик','абрикос','слив','груш','дыня','арбуз'] },
+  grains:  { label: 'Крупы',       keywords: ['рис','гречк','мука','хлеб','макарон','спагетт','лапша','овсянк','пшено','булгур','перловк','крупа','тесто','батон','лаваш'] },
+  oils:    { label: 'Масла и соусы', keywords: ['масл','соевый соус','кетчуп','майонез','горчиц','уксус','паста томат','соус'] },
+  spices:  { label: 'Специи',      keywords: ['соль','перец молот','специи','кунжут','корица','паприка','карри','куркума','тмин','базилик','орегано','тимьян','лавровый'] },
+  other:   { label: 'Прочее',      keywords: [] },
+}
+
+function getIngredientCat(name) {
+  const n = name.toLowerCase()
+  for (const [cat, { keywords }] of Object.entries(SHOP_CATS)) {
+    if (cat === 'other') continue
+    if (keywords.some(kw => n.includes(kw))) return cat
+  }
+  return 'other'
+}
 const RU_DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']
 const RU_MONTHS_FULL = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const RU_MONTHS_GEN  = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
@@ -782,6 +822,9 @@ let planEntries = [] // { id, date, meal_type, recipe_id }
 let shopping = {}
 let customShoppingItems = {}
 let filterCat = 'all'
+let shopFromDate = ''
+let shopToDate = ''
+let shopCatFilter = 'all'
 let editingId = null
 let addCtx = null
 let viewMode = 'week'
@@ -1318,8 +1361,10 @@ function renderWeek() {
       <div class="cal-header-row">
         <div class="cal-label-spacer"></div>
         ${days.map((d, i) => {
-          const isToday = dateKey(d) === today
-          return `<div class="cal-day-head${isToday ? ' today' : ''}">
+          const dk = dateKey(d)
+          const isToday = dk === today
+          const isPast = dk < today
+          return `<div class="cal-day-head${isToday ? ' today' : isPast ? ' past' : ''}">
             <div class="cal-day-name">${RU_DAYS[i]}</div>
             <div class="cal-day-num">${d.getDate()}</div>
           </div>`
@@ -1334,7 +1379,8 @@ function renderWeek() {
           ${days.map(d => {
             const dk = dateKey(d)
             const isToday = dk === today
-            return `<div class="cal-cell${isToday ? ' today-col' : ''}" data-meal="${mt.key}"
+            const isPast = dk < today
+            return `<div class="cal-cell${isToday ? ' today-col' : isPast ? ' past-col' : ''}" data-meal="${mt.key}"
               ondragover="onCalDragOver(event)"
               ondragleave="onCalDragLeave(event)"
               ondrop="onCalDrop(event,'${dk}','${mt.key}')">
@@ -1347,7 +1393,8 @@ function renderWeek() {
               if (!r) return ''
               const isSingle = span.startIdx === span.endIdx
               const eids = JSON.stringify(span.spanEntryIds)
-              return `<div class="cal-chip ${mt.key}"
+              const isPastSpan = span.endDate < today
+              return `<div class="cal-chip ${mt.key}${isPastSpan ? ' past-chip' : ''}"
                 style="grid-column:${span.startIdx + 1}/${span.endIdx + 2}"
                 ${isSingle ? `draggable="true" ondragstart="onCalDragStart(event,${span.spanEntryIds[0]})" ondragend="onCalDragEnd(event)"` : ''}>
                 <span class="cal-chip-name" title="${escHtml(r.name)}">${r.emoji || '🍽️'} ${escHtml(r.name)}</span>
@@ -1466,10 +1513,23 @@ function formatSums(sums, extras) {
   return parts.join(' + ')
 }
 
+function initShopDates() {
+  const start = currentWeekStart()
+  shopFromDate = dateKey(start)
+  shopToDate = dateKey(addDays(start, 6))
+}
+
 async function genShopping() {
+  if (!shopFromDate || !shopToDate) initShopDates()
+  const fromEl = document.getElementById('shop-from')
+  const toEl = document.getElementById('shop-to')
+  if (fromEl) fromEl.value = shopFromDate
+  if (toEl) toEl.value = shopToDate
+
   const prev = shopping
   const all = {}
-  planEntries.forEach(e => {
+  const filtered = planEntries.filter(e => e.date >= shopFromDate && e.date <= shopToDate)
+  filtered.forEach(e => {
     const r = recipes.find(x => x.id === e.recipe_id)
     if (!r) return
     ;(r.ingredients || []).forEach(i => {
@@ -1495,26 +1555,52 @@ async function genShopping() {
 
 function renderShopping() {
   const el = document.getElementById('shopping-content')
+  // sync date inputs
+  if (shopFromDate || shopToDate) {
+    const fromEl = document.getElementById('shop-from')
+    const toEl = document.getElementById('shop-to')
+    if (fromEl && shopFromDate) fromEl.value = shopFromDate
+    if (toEl && shopToDate) toEl.value = shopToDate
+  }
+
   const allItems = Object.values(shopping)
   const keys = Object.keys(shopping)
-  const totalMeals = planEntries.length
+  const periodEntries = (shopFromDate && shopToDate)
+    ? planEntries.filter(e => e.date >= shopFromDate && e.date <= shopToDate)
+    : planEntries
   const checked = allItems.filter(i => i.checked).length
 
   if (!allItems.length) {
     const hasPlan = planEntries.length > 0
-    el.innerHTML = `<div class="empty-state"><div class="es-icon">🛒</div><p>${hasPlan ? 'Нажми «Обновить из плана» чтобы собрать список' : 'Сначала добавь блюда в планировщик'}</p></div>`
+    el.innerHTML = `<div class="empty-state"><div class="es-icon">🛒</div><p>${hasPlan ? 'Нажми «Обновить» чтобы собрать список' : 'Сначала добавь блюда в планировщик'}</p></div>`
     return
   }
+
+  // build category filter chips (only cats that have items)
+  const presentCats = [...new Set(allItems.map(item => getIngredientCat(item.name)))]
+  const catChips = [
+    { key: 'all', label: 'Все' },
+    ...Object.entries(SHOP_CATS).filter(([k]) => presentCats.includes(k)).map(([k, v]) => ({ key: k, label: v.label }))
+  ]
+
+  // filter items by selected cat
+  const visibleKeys = shopCatFilter === 'all'
+    ? keys
+    : keys.filter(k => getIngredientCat(shopping[k].name) === shopCatFilter)
+
   el.innerHTML = `
     <div class="shop-stats">
       <div class="stat-card"><div class="stat-num">${allItems.length}</div><div class="stat-lbl">позиций</div></div>
-      <div class="stat-card"><div class="stat-num">${totalMeals}</div><div class="stat-lbl">блюд в плане</div></div>
+      <div class="stat-card"><div class="stat-num">${periodEntries.length}</div><div class="stat-lbl">блюд</div></div>
       <div class="stat-card"><div class="stat-num">${checked}/${allItems.length}</div><div class="stat-lbl">куплено</div></div>
     </div>
+    <div class="shop-filters">
+      ${catChips.map(c => `<button class="shop-filter-chip${shopCatFilter === c.key ? ' active' : ''}" onclick="shopCatFilter='${c.key}';renderShopping()">${c.label}</button>`).join('')}
+    </div>
     <div class="shop-section">
-      <div class="shop-section-title">Продукты</div>
-      ${allItems.map((item, i) => {
-        const k = keys[i]
+      ${visibleKeys.map(k => {
+        const item = shopping[k]
+        const i = keys.indexOf(k)
         const p = item.amount && item.amount !== '—' ? parseQtyUnit(item.amount) : { qty: null, unit: 'г' }
         const qtyVal = p.qty !== null ? (p.qty % 1 === 0 ? p.qty : +p.qty.toFixed(1)) : 0
         const unitVal = p.unit || 'г'
