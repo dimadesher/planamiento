@@ -310,8 +310,10 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 .cal-row-label.lunch { color: var(--lunch-t); background: var(--lunch); }
 .cal-row-label.dinner { color: var(--dinner-t); background: var(--dinner); }
 .cal-row-label.snack { color: var(--snack-t); background: var(--snack); }
-.cal-cell { height: 86px; padding: 5px; border-left: 1px solid var(--border); display: flex; align-items: flex-end; transition: background .12s; }
-.cal-chips-layer { position: absolute; left: 80px; top: 0; right: 0; height: 86px; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: min-content; align-content: start; gap: 3px 0; padding: 4px 0; pointer-events: none; z-index: 2; overflow: hidden; }
+.cal-cell { height: 86px; padding: 5px; border-left: 1px solid var(--border); display: flex; align-items: flex-end; transition: background .12s; position: relative; }
+.cal-drop-zone { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+body.dragging-active .cal-drop-zone { pointer-events: auto; }
+.cal-chips-layer { position: absolute; left: 80px; top: 0; right: 0; height: 86px; display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 26px; align-content: start; gap: 3px 0; padding: 4px 0; pointer-events: none; z-index: 2; overflow: hidden; }
 .cal-chips-layer .cal-chip { pointer-events: auto; margin: 0 2px; min-width: 0; }
 body.dragging-active .cal-chip { pointer-events: none !important; }
 /* ── RECIPE PALETTE ── */
@@ -334,19 +336,24 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .cal-day-head.past .cal-day-num { color: var(--text-3); }
 .cal-day-head.past .cal-day-name { opacity: 0.5; }
 .cal-chip.past-chip { opacity: 0.4; filter: grayscale(0.6); }
+.cal-chip.selected { box-shadow: inset 0 0 0 2px rgba(0,0,0,.18); }
+.cal-chip.selected.breakfast { background: #F5C87A; }
+.cal-chip.selected.lunch { background: #8ECBA8; }
+.cal-chip.selected.dinner { background: #93B8E0; }
+.cal-chip.selected.snack { background: #E898BB; }
+.cal-chip-rm-sel { display: none; background: none; border: none; cursor: pointer; color: inherit; font-size: 14px; padding: 0; flex-shrink: 0; line-height: 1; opacity: .6; transition: opacity .12s; }
+.cal-chip-rm-sel:hover { opacity: 1; }
+.cal-chip.selected .cal-chip-rm-sel { display: inline-flex; align-items: center; }
 .cal-cell.drag-over { background: var(--accent-light) !important; outline: 2px solid var(--accent); outline-offset: -2px; }
-.cal-chip { border-radius: 5px; padding: 4px 6px; font-size: 11px; font-weight: 500; cursor: grab; display: flex; align-items: center; gap: 4px; user-select: none; transition: opacity .15s; }
+.cal-chip { border-radius: 5px; padding: 4px 6px; font-size: 11px; font-weight: 500; cursor: grab; display: flex; align-items: center; gap: 4px; user-select: none; transition: opacity .15s; position: relative; height: 26px; box-sizing: border-box; }
+.cal-chip.resize-cursor { cursor: ew-resize; }
 .cal-chip:active { cursor: grabbing; }
-.cal-chip.dragging { opacity: .3; }
+.cal-chip.dragging, .cal-chip.moving { opacity: .3; }
 .cal-chip.breakfast { background: var(--breakfast); color: var(--breakfast-t); }
 .cal-chip.lunch { background: var(--lunch); color: var(--lunch-t); }
 .cal-chip.dinner { background: var(--dinner); color: var(--dinner-t); }
 .cal-chip.snack { background: var(--snack); color: var(--snack-t); }
 .cal-chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.cal-chip-rm { background: none; border: none; cursor: pointer; color: inherit; opacity: .45; font-size: 14px; padding: 0; flex-shrink: 0; line-height: 1; transition: opacity .12s; }
-.cal-chip-rm:hover { opacity: 1; }
-.cal-chip-extend { background: none; border: none; cursor: col-resize; color: inherit; opacity: .3; font-size: 11px; padding: 0 0 0 1px; flex-shrink: 0; line-height: 1; transition: opacity .12s; user-select: none; }
-.cal-chip-extend:hover { opacity: .8; }
 .cal-cell.extend-over { background: rgba(45,106,79,.15) !important; outline: 2px dashed var(--accent); outline-offset: -2px; }
 .cal-add-btn { align-self: flex-start; font-size: 10px; color: var(--text-3); border: 1px dashed var(--border); border-radius: 4px; background: none; cursor: pointer; padding: 2px 7px; transition: all .12s; white-space: nowrap; margin-top: auto; }
 .cal-add-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
@@ -476,6 +483,16 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 }
 .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); background: var(--surface); }
 .fg textarea { height: 80px; resize: vertical; }
+.seg-tabs { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); margin-bottom: 14px; }
+.seg-tab { border: 0; border-radius: 6px; padding: 7px 12px; background: transparent; color: var(--text-2); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .12s, color .12s; }
+.seg-tab.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-sm); }
+.recipe-ai-panel { display: none; border: 1px solid var(--border); border-radius: var(--r); padding: 12px; margin-bottom: 14px; background: var(--bg); }
+.recipe-ai-panel.active { display: block; }
+.recipe-ai-row { display: flex; gap: 8px; align-items: flex-end; }
+.recipe-ai-row .fg { flex: 1; margin-bottom: 0; }
+.recipe-ai-status { display: none; font-size: 13px; color: var(--text-2); margin-top: 8px; }
+.desc-tools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+.desc-ai-status { display: none; font-size: 13px; color: var(--text-2); margin-top: 6px; }
 .ingr-row { display: flex; gap: 6px; margin-bottom: 7px; align-items: center; }
 .ingr-row input { flex: 1; min-width: 0; }
 .ingr-row .ingr-qty { width: 60px; flex: none; }
@@ -483,6 +500,15 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 .ingr-rm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 20px; padding: 0 3px; transition: color .12s; }
 .ingr-rm:hover { color: var(--danger-t); }
 .modal-footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+.add-cat-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.cat-filter-btn { border-radius: 20px; padding: 5px 13px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); cursor: pointer; transition: all .12s; white-space: nowrap; }
+.cat-filter-btn:hover { border-color: var(--border-strong); color: var(--text); }
+.cat-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.cat-filter-btn.active.breakfast { background: var(--breakfast-t); border-color: var(--breakfast-t); }
+.cat-filter-btn.active.lunch { background: var(--lunch-t); border-color: var(--lunch-t); }
+.cat-filter-btn.active.dinner { background: var(--dinner-t); border-color: var(--dinner-t); }
+.cat-filter-btn.active.snack { background: var(--snack-t); border-color: var(--snack-t); }
+.cat-filter-btn.active.dessert { background: #5B21B6; border-color: #5B21B6; }
 .recipe-select-list { border: 1px solid var(--border); border-radius: var(--r); max-height: 260px; overflow-y: auto; }
 .rsel-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
 .rsel-item:last-child { border-bottom: none; }
@@ -710,6 +736,20 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
 <div class="modal-overlay" id="modal-recipe">
   <div class="modal">
     <h3 id="modal-recipe-title">Новый рецепт</h3>
+    <div class="seg-tabs" id="recipe-mode-tabs">
+      <button class="seg-tab active" type="button" onclick="setRecipeMode('manual')">Вручную</button>
+      <button class="seg-tab" type="button" onclick="setRecipeMode('ai')">С ИИ</button>
+    </div>
+    <div class="recipe-ai-panel" id="recipe-ai-panel">
+      <div class="recipe-ai-row">
+        <div class="fg">
+          <label>Что приготовить</label>
+          <input type="text" id="recipe-ai-name" placeholder="Паста карбонара" onkeydown="if(event.key==='Enter')generateRecipeInForm()">
+        </div>
+        <button class="btn-accent" id="recipe-ai-btn" type="button" onclick="generateRecipeInForm()">✨ Сгенерировать</button>
+      </div>
+      <div class="recipe-ai-status" id="recipe-ai-status"></div>
+    </div>
     <div class="fg"><label>Эмодзи</label><input type="text" id="r-emoji" maxlength="4" placeholder="🍽️" style="width:70px"></div>
     <div class="fg"><label>Название</label><input type="text" id="r-name" placeholder="Паста карбонара"></div>
     <div class="fg"><label>Категория</label>
@@ -727,10 +767,19 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
     </div>
     <div class="fg">
       <label>Ингредиенты</label>
+      <datalist id="ingredient-suggestions"></datalist>
       <div id="ingr-list"></div>
       <button class="btn-ghost btn-sm" onclick="addIngrRow()" style="margin-top:6px">+ Добавить ингредиент</button>
     </div>
-    <div class="fg"><label>Способ приготовления</label><textarea id="r-desc" placeholder="Опишите шаги приготовления..."></textarea></div>
+    <div class="fg">
+      <label>Способ приготовления</label>
+      <div class="desc-tools">
+        <button class="btn-ghost btn-sm" id="desc-ai-btn" type="button" onclick="generateDescriptionInForm()">✨ Сгенерировать шаги</button>
+        <button class="btn-ghost btn-sm" id="desc-undo-btn" type="button" onclick="undoGeneratedDescription()" style="display:none">↶ Вернуть текст</button>
+      </div>
+      <textarea id="r-desc" placeholder="Опишите шаги приготовления..."></textarea>
+      <div class="desc-ai-status" id="desc-ai-status"></div>
+    </div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('modal-recipe')">Отмена</button>
       <button class="btn-accent" onclick="saveRecipe()">Сохранить рецепт</button>
@@ -748,6 +797,7 @@ body.dragging-active .cal-chip { pointer-events: none !important; }
   <div class="modal">
     <h3 id="add-modal-title">Добавить блюдо</h3>
     <div id="add-modal-sub" style="font-size:13px;color:var(--text-2);margin-bottom:14px"></div>
+    <div class="add-cat-filters" id="add-cat-filters"></div>
     <input class="search-input" type="text" id="add-search" placeholder="Поиск рецепта..." oninput="renderAddList()" style="margin-bottom:12px;padding-left:14px">
     <div class="recipe-select-list" id="add-list"></div>
     <div class="modal-footer">
@@ -827,6 +877,9 @@ let shopToDate = ''
 let shopCatFilter = 'all'
 let editingId = null
 let addCtx = null
+let addCatFilter = 'all'
+let recipeFormMode = 'manual'
+let descUndoStack = []
 let viewMode = 'week'
 let weekOffset = 0
 let monthOffset = 0
@@ -885,6 +938,54 @@ async function signOut() {
 }
 
 // ─── INIT ────────────────────────────────────────────
+document.addEventListener('dragend', () => document.body.classList.remove('dragging-active'))
+document.addEventListener('mousemove', e => {
+  if (!pointerResizeSpan) return
+  if (Math.abs(e.clientX - pointerResizeSpan.startX) + Math.abs(e.clientY - pointerResizeSpan.startY) > 3) {
+    pointerResizeSpan.moved = true
+  }
+  markResizeTarget(e.clientX, e.clientY)
+})
+document.addEventListener('mousemove', e => {
+  if (!pointerMoveSpan) return
+  if (Math.abs(e.clientX - pointerMoveSpan.startX) + Math.abs(e.clientY - pointerMoveSpan.startY) > 3) {
+    pointerMoveSpan.moved = true
+  }
+  markMoveTarget(e.clientX, e.clientY)
+})
+document.addEventListener('mouseup', async e => {
+  if (!pointerResizeSpan) return
+  const target = markResizeTarget(e.clientX, e.clientY)
+  if (target && pointerResizeSpan.moved) {
+    suppressChipClick = true
+    await resizeSpanTo(target.date, target.mealType)
+  }
+  clearPointerResize()
+})
+document.addEventListener('mouseup', async e => {
+  if (!pointerMoveSpan) return
+  const target = markMoveTarget(e.clientX, e.clientY)
+  if (target && pointerMoveSpan.moved) {
+    suppressChipClick = true
+    await movePointerSpanTo(pointerMoveSpan, target.date, target.mealType)
+  }
+  clearPointerMove()
+})
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedSpanEntryIds?.length) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+    e.preventDefault()
+    removeSpan(selectedSpanEntryIds)
+    selectedSpanEntryIds = null
+  }
+})
+document.addEventListener('click', e => {
+  if (selectedSpanEntryIds && !e.target.closest('.cal-chip')) {
+    selectedSpanEntryIds = null
+    document.querySelectorAll('.cal-chip.selected').forEach(c => c.classList.remove('selected'))
+  }
+})
+
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession()
   if (session) {
@@ -924,6 +1025,34 @@ async function initApp(user) {
 async function loadRecipes() {
   const { data, error } = await sb.from('recipes').select('*, ingredients(*)').order('created_at', { ascending: false })
   if (!error) recipes = data || []
+}
+
+function getIngredientCatalog() {
+  const catalog = {}
+  recipes.forEach(r => {
+    ;(r.ingredients || []).forEach(i => {
+      const name = (i.name || '').trim()
+      if (!name) return
+      const key = name.toLowerCase()
+      const unit = parseAmount(i.amount || '').unit || 'г'
+      if (!catalog[key]) catalog[key] = { name, units: {} }
+      catalog[key].units[unit] = (catalog[key].units[unit] || 0) + 1
+    })
+  })
+  return catalog
+}
+
+function getPreferredIngredientUnit(name) {
+  const item = getIngredientCatalog()[(name || '').trim().toLowerCase()]
+  if (!item) return null
+  return Object.entries(item.units).sort((a, b) => b[1] - a[1])[0]?.[0] || null
+}
+
+function renderIngredientSuggestions() {
+  const dl = document.getElementById('ingredient-suggestions')
+  if (!dl) return
+  const items = Object.values(getIngredientCatalog()).sort((a, b) => a.name.localeCompare(b.name, 'ru'))
+  dl.innerHTML = items.map(i => `<option value="${escHtml(i.name)}"></option>`).join('')
 }
 
 function setFilter(cat) {
@@ -1063,21 +1192,44 @@ async function deleteRecipe(id) {
   toast('Рецепт удалён')
 }
 
-function openRecipeModal(id) {
+function openRecipeModal(id, mode = 'manual') {
   editingId = id || null
   const r = id ? recipes.find(x => x.id === id) : null
   document.getElementById('modal-recipe-title').textContent = r ? 'Редактировать рецепт' : 'Новый рецепт'
+  setRecipeMode(r ? 'manual' : mode)
+  document.getElementById('recipe-ai-name').value = ''
+  document.getElementById('recipe-ai-status').style.display = 'none'
+  const aiBtn = document.getElementById('recipe-ai-btn')
+  aiBtn.disabled = false
+  aiBtn.textContent = '✨ Сгенерировать'
   document.getElementById('r-emoji').value = r?.emoji || '🍽️'
   document.getElementById('r-name').value = r?.name || ''
   document.getElementById('r-cat').value = r?.category || 'breakfast'
   document.getElementById('r-time').value = r?.cook_time || ''
   document.getElementById('r-servings').value = r?.servings || 2
   document.getElementById('r-desc').value = r?.description || ''
+  descUndoStack = []
+  document.getElementById('desc-undo-btn').style.display = 'none'
+  document.getElementById('desc-ai-status').style.display = 'none'
+  const descBtn = document.getElementById('desc-ai-btn')
+  descBtn.disabled = false
+  descBtn.textContent = '✨ Сгенерировать шаги'
   const il = document.getElementById('ingr-list')
   il.innerHTML = ''
   const ingrs = r?.ingredients?.length ? r.ingredients : [{ name: '', amount: '' }]
   ingrs.forEach(i => addIngrRow(i.name, i.amount))
+  renderIngredientSuggestions()
   openModal('modal-recipe')
+  setTimeout(() => document.getElementById(mode === 'ai' && !r ? 'recipe-ai-name' : 'r-name')?.focus(), 80)
+}
+
+function setRecipeMode(mode) {
+  recipeFormMode = mode
+  document.querySelectorAll('#recipe-mode-tabs .seg-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && mode === 'manual') || (i === 1 && mode === 'ai'))
+  })
+  document.getElementById('recipe-ai-panel')?.classList.toggle('active', mode === 'ai')
+  setTimeout(() => document.getElementById(mode === 'ai' ? 'recipe-ai-name' : 'r-name')?.focus(), 0)
 }
 
 const UNITS = ['г','кг','мл','л','шт.','ст.л.','ч.л.','щепотка','по вкусу']
@@ -1128,23 +1280,25 @@ function addIngrRow(name = '', amount = '') {
   const row = document.createElement('div')
   row.className = 'ingr-row'
   row.innerHTML = `
-    <input type="text" placeholder="Ингредиент" value="${name}">
-    <input type="text" class="ingr-qty" placeholder="0" value="${qty}">
+    <input type="text" placeholder="Ингредиент" value="${escHtml(name)}" list="ingredient-suggestions" oninput="syncIngredientUnit(this)">
+    <input type="text" class="ingr-qty" placeholder="0" value="${escHtml(qty)}">
     <select class="ingr-unit">${UNITS.map(u => `<option value="${u}"${u === unit ? ' selected' : ''}>${u}</option>`).join('')}</select>
     <button class="ingr-rm" onclick="this.parentElement.remove()" aria-label="Удалить">×</button>`
   il.appendChild(row)
+  setTimeout(() => row.querySelector('input')?.focus(), 0)
+}
+
+function syncIngredientUnit(input) {
+  const unit = getPreferredIngredientUnit(input.value)
+  if (!unit) return
+  const sel = input.closest('.ingr-row')?.querySelector('.ingr-unit')
+  if (sel) sel.value = unit
 }
 
 async function saveRecipe() {
   const name = document.getElementById('r-name').value.trim()
   if (!name) { toast('Введи название рецепта'); return }
-  const ingredients = Array.from(document.querySelectorAll('#ingr-list .ingr-row')).map(row => {
-    const name = row.querySelector('input').value.trim()
-    const qty = row.querySelector('.ingr-qty').value.trim()
-    const unit = row.querySelector('.ingr-unit').value
-    const amount = qty ? `${qty} ${unit}` : ''
-    return { name, amount }
-  }).filter(i => i.name)
+  const ingredients = getRecipeFormIngredients()
 
   const payload = {
     name,
@@ -1168,6 +1322,7 @@ async function saveRecipe() {
     await sb.from('ingredients').insert(ingredients.map(i => ({ ...i, recipe_id: recipeId })))
   }
   await loadRecipes()
+  renderIngredientSuggestions()
   closeModal('modal-recipe')
   renderRecipes()
   toast(editingId ? 'Рецепт обновлён' : 'Рецепт добавлен!')
@@ -1215,16 +1370,259 @@ function renderPlan() {
 
 let calDragEntryId = null
 let calDragRecipeId = null
-let calExtendRecipeId = null
-let calExtendMealType = null
-let calExtendSpanEnd = null
+let calDragSpan = null
+let calResizeSpan = null
+let pointerResizeSpan = null
+let pointerMoveSpan = null
+let suppressChipClick = false
+let selectedSpanEntryIds = null
 
 function clearDragState() {
   calDragEntryId = null
   calDragRecipeId = null
-  calExtendRecipeId = null
-  calExtendMealType = null
-  calExtendSpanEnd = null
+  calDragSpan = null
+  calResizeSpan = null
+}
+
+function clearPointerResize() {
+  pointerResizeSpan = null
+  calResizeSpan = null
+  document.body.classList.remove('dragging-active')
+  document.querySelectorAll('.cal-chip.resizing').forEach(c => c.classList.remove('resizing'))
+  document.querySelectorAll('.cal-chip.resize-cursor').forEach(c => c.classList.remove('resize-cursor'))
+  document.querySelectorAll('.cal-cell.extend-over').forEach(c => c.classList.remove('extend-over'))
+}
+
+function clearPointerMove() {
+  pointerMoveSpan = null
+  calDragSpan = null
+  calDragEntryId = null
+  document.body.classList.remove('dragging-active')
+  document.querySelectorAll('.cal-chip.moving').forEach(c => c.classList.remove('moving'))
+  document.querySelectorAll('.cal-cell.drag-over').forEach(c => c.classList.remove('drag-over'))
+}
+
+function onChipClick(e, entryIds) {
+  if (suppressChipClick) { suppressChipClick = false; return }
+  e.stopPropagation()
+  document.querySelectorAll('.cal-chip.selected').forEach(c => c.classList.remove('selected'))
+  const key = entryIds.join(',')
+  if (selectedSpanEntryIds?.join(',') === key) {
+    selectedSpanEntryIds = null
+  } else {
+    selectedSpanEntryIds = entryIds
+    e.currentTarget.classList.add('selected')
+  }
+}
+
+function getResizeSideFromPoint(el, clientX) {
+  const rect = el.getBoundingClientRect()
+  const zone = Math.min(24, rect.width / 3)
+  if (clientX <= rect.left + zone) return 'left'
+  if (clientX >= rect.right - zone) return 'right'
+  return null
+}
+
+function getCalendarCellFromPoint(clientX, clientY) {
+  const el = document.elementFromPoint(clientX, clientY)
+  return el?.closest?.('.cal-cell') || null
+}
+
+function markResizeTarget(clientX, clientY) {
+  document.querySelectorAll('.cal-cell.extend-over').forEach(c => c.classList.remove('extend-over'))
+  if (!pointerResizeSpan) return null
+  const cell = getCalendarCellFromPoint(clientX, clientY)
+  if (!cell) return null
+  const date = cell.dataset.date
+  const mealType = cell.dataset.meal
+  if (canResizeSpanTo(date, mealType)) {
+    cell.classList.add('extend-over')
+    return { date, mealType }
+  }
+  return null
+}
+
+function onChipMouseDown(e, span) {
+  if (e.button !== 0) return
+  if (e.target.closest('.cal-chip-rm-sel')) return
+  const side = getResizeSideFromPoint(e.currentTarget, e.clientX)
+  e.preventDefault()
+  e.stopPropagation()
+  if (!side) {
+    pointerMoveSpan = { ...span, moved: false, startX: e.clientX, startY: e.clientY }
+    if (span.entryIds.length === 1) calDragEntryId = span.entryIds[0]
+    else calDragSpan = pointerMoveSpan
+    document.body.classList.add('dragging-active')
+    e.currentTarget.classList.add('moving')
+    markMoveTarget(e.clientX, e.clientY)
+    return
+  }
+  pointerResizeSpan = { ...span, side, moved: false, startX: e.clientX, startY: e.clientY }
+  calResizeSpan = pointerResizeSpan
+  document.body.classList.add('dragging-active')
+  e.currentTarget.classList.add('resizing')
+  markResizeTarget(e.clientX, e.clientY)
+}
+
+function markMoveTarget(clientX, clientY) {
+  document.querySelectorAll('.cal-cell.drag-over').forEach(c => c.classList.remove('drag-over'))
+  if (!pointerMoveSpan) return null
+  const cell = getCalendarCellFromPoint(clientX, clientY)
+  if (!cell) return null
+  cell.classList.add('drag-over')
+  return { date: cell.dataset.date, mealType: cell.dataset.meal }
+}
+
+async function movePointerSpanTo(span, date, mealType) {
+  if (span.entryIds.length === 1) {
+    await moveSingleEntryTo(span.entryIds[0], date, mealType)
+    return
+  }
+  calDragSpan = span
+  await moveSpanTo(date, mealType)
+}
+
+function onChipMouseMove(e) {
+  if (pointerResizeSpan || pointerMoveSpan) return
+  e.currentTarget.classList.toggle('resize-cursor', !!getResizeSideFromPoint(e.currentTarget, e.clientX))
+}
+
+function onChipMouseLeave(e) {
+  if (!pointerResizeSpan && !pointerMoveSpan) e.currentTarget.classList.remove('resize-cursor')
+}
+
+function onDropZoneOver(e, date, mealType) {
+  e.preventDefault()
+  const cell = e.currentTarget.parentElement
+  document.querySelectorAll('.cal-cell.drag-over,.cal-cell.extend-over').forEach(c => c.classList.remove('drag-over','extend-over'))
+  if (calResizeSpan) {
+    if (canResizeSpanTo(date, mealType)) {
+      e.dataTransfer.dropEffect = 'copy'
+      cell.classList.add('extend-over')
+    }
+  } else if (calDragSpan || calDragEntryId || calDragRecipeId) {
+    e.dataTransfer.dropEffect = calDragRecipeId ? 'copy' : 'move'
+    cell.classList.add('drag-over')
+  }
+}
+function onDropZoneLeave(e) {
+  e.currentTarget.parentElement.classList.remove('drag-over','extend-over')
+}
+async function onDropZoneDrop(e, date, mealType) {
+  e.preventDefault()
+  document.querySelectorAll('.cal-cell.drag-over,.cal-cell.extend-over').forEach(c => c.classList.remove('drag-over','extend-over'))
+  if (calResizeSpan) {
+    await resizeSpanTo(date, mealType)
+    clearDragState(); return
+  }
+  if (calDragSpan) {
+    await moveSpanTo(date, mealType)
+    clearDragState(); return
+  }
+  if (calDragEntryId) {
+    await moveSingleEntryTo(calDragEntryId, date, mealType)
+    calDragEntryId = null
+  } else if (calDragRecipeId) {
+    const { data, error } = await sb.from('plan_entries').insert({
+      date, meal_type: mealType, recipe_id: calDragRecipeId, user_id: currentUser.id
+    }).select().single()
+    if (!error && data) { planEntries.push(data); renderPlan() }
+    calDragRecipeId = null
+  }
+}
+
+function datesInRange(startDate, endDate) {
+  const dates = []
+  const cur = new Date(startDate + 'T00:00:00')
+  while (dateKey(cur) <= endDate) {
+    dates.push(dateKey(cur))
+    cur.setDate(cur.getDate() + 1)
+  }
+  return dates
+}
+
+function addDaysToKey(dk, n) {
+  return dateKey(addDays(new Date(dk + 'T00:00:00'), n))
+}
+
+function spanLength(startDate, endDate) {
+  return datesInRange(startDate, endDate).length
+}
+
+function hasPlanEntry(dk, mealType, recipeId, excludeIds = []) {
+  return planEntries.some(x =>
+    x.date === dk &&
+    x.meal_type === mealType &&
+    x.recipe_id === recipeId &&
+    !excludeIds.includes(x.id)
+  )
+}
+
+async function insertPlanDates(recipeId, mealType, dates, excludeIds = []) {
+  const uniqueDates = [...new Set(dates)]
+    .filter(dk => !hasPlanEntry(dk, mealType, recipeId, excludeIds))
+  if (!uniqueDates.length) return []
+  const rows = uniqueDates.map(d => ({ date: d, meal_type: mealType, recipe_id: recipeId, user_id: currentUser.id }))
+  const { data, error } = await sb.from('plan_entries').insert(rows).select()
+  if (error) { toast('Не удалось обновить план'); return null }
+  return data || []
+}
+
+async function deletePlanIds(entryIds) {
+  if (!entryIds?.length) return true
+  const { error } = await sb.from('plan_entries').delete().in('id', entryIds)
+  if (error) { toast('Не удалось удалить старые дни'); return false }
+  return true
+}
+
+async function replaceEntries(entryIds, recipeId, mealType, dates) {
+  const inserted = await insertPlanDates(recipeId, mealType, dates, entryIds)
+  if (inserted === null) return
+  const deleted = await deletePlanIds(entryIds)
+  if (!deleted) { await loadPlan(); renderPlan(); return }
+  planEntries = planEntries.filter(x => !entryIds.includes(x.id))
+  planEntries.push(...inserted)
+  selectedSpanEntryIds = null
+  renderPlan()
+}
+
+async function moveSingleEntryTo(entryId, date, mealType) {
+  const entry = planEntries.find(x => x.id === entryId)
+  if (!entry) return
+  await replaceEntries([entryId], entry.recipe_id, mealType, [date])
+}
+
+async function moveSpanTo(date, mealType) {
+  if (!calDragSpan) return
+  const len = spanLength(calDragSpan.startDate, calDragSpan.endDate)
+  const dates = Array.from({ length: len }, (_, i) => addDaysToKey(date, i))
+  await replaceEntries(calDragSpan.entryIds, calDragSpan.recipeId, mealType, dates)
+}
+
+function canResizeSpanTo(date, mealType) {
+  if (!calResizeSpan || mealType !== calResizeSpan.mealType) return false
+  return calResizeSpan.side === 'left'
+    ? date <= calResizeSpan.endDate
+    : date >= calResizeSpan.startDate
+}
+
+async function resizeSpanTo(date, mealType) {
+  if (!canResizeSpanTo(date, mealType)) return
+  const span = calResizeSpan
+  const nextStart = span.side === 'left' ? date : span.startDate
+  const nextEnd = span.side === 'right' ? date : span.endDate
+  const nextDates = datesInRange(nextStart, nextEnd)
+  const keepDates = datesInRange(span.startDate, span.endDate)
+  const removeIds = span.entryIds.filter((id, i) => !nextDates.includes(keepDates[i]))
+  const addDates = nextDates.filter(dk => !keepDates.includes(dk))
+  const inserted = await insertPlanDates(span.recipeId, span.mealType, addDates, span.entryIds)
+  if (inserted === null) return
+  const deleted = await deletePlanIds(removeIds)
+  if (!deleted) { await loadPlan(); renderPlan(); return }
+  planEntries = planEntries.filter(x => !removeIds.includes(x.id))
+  planEntries.push(...inserted)
+  selectedSpanEntryIds = null
+  renderPlan()
 }
 
 function getChipSpans(weekEntries, days, mealType) {
@@ -1262,89 +1660,10 @@ async function removeSpan(entryIds) {
   if (!error) { planEntries = planEntries.filter(x => !entryIds.includes(x.id)); renderPlan() }
 }
 
-function onCalDragStart(e, entryId) {
-  clearDragState()
-  calDragEntryId = entryId
-  document.body.classList.add('dragging-active')
-  e.dataTransfer.effectAllowed = 'move'
-  setTimeout(() => e.target.classList.add('dragging'), 0)
-}
 function onCalDragEnd(e) {
   document.body.classList.remove('dragging-active')
   document.querySelectorAll('.cal-chip.dragging,.palette-chip.dragging').forEach(c => c.classList.remove('dragging'))
   document.querySelectorAll('.cal-cell.drag-over,.cal-cell.extend-over').forEach(c => { c.classList.remove('drag-over'); c.classList.remove('extend-over') })
-}
-function onCalDragOver(e) {
-  e.preventDefault()
-  if (calExtendRecipeId) {
-    if (e.currentTarget.dataset.meal === calExtendMealType) {
-      e.dataTransfer.dropEffect = 'copy'
-      e.currentTarget.classList.add('extend-over')
-    }
-  } else {
-    e.dataTransfer.dropEffect = 'move'
-    e.currentTarget.classList.add('drag-over')
-  }
-}
-function onCalDragLeave(e) {
-  if (!e.currentTarget.contains(e.relatedTarget)) {
-    e.currentTarget.classList.remove('drag-over')
-    e.currentTarget.classList.remove('extend-over')
-  }
-}
-async function onCalDrop(e, date, mealType) {
-  e.preventDefault()
-  e.currentTarget.classList.remove('drag-over')
-  e.currentTarget.classList.remove('extend-over')
-
-  if (calExtendRecipeId) {
-    if (mealType !== calExtendMealType || date <= calExtendSpanEnd) { clearDragState(); return }
-    const toInsert = []
-    const cur = new Date(calExtendSpanEnd + 'T00:00:00')
-    cur.setDate(cur.getDate() + 1)
-    while (dateKey(cur) <= date) {
-      const dk = dateKey(cur)
-      if (!planEntries.some(x => x.date === dk && x.meal_type === mealType && x.recipe_id === calExtendRecipeId)) toInsert.push(dk)
-      cur.setDate(cur.getDate() + 1)
-    }
-    if (toInsert.length) {
-      const rows = toInsert.map(d => ({ date: d, meal_type: mealType, recipe_id: calExtendRecipeId, user_id: currentUser.id }))
-      const { data, error } = await sb.from('plan_entries').insert(rows).select()
-      if (!error && data) { planEntries.push(...data); renderPlan() }
-    }
-    clearDragState(); return
-  }
-
-  if (calDragEntryId) {
-    const { data, error } = await sb.from('plan_entries')
-      .update({ date, meal_type: mealType })
-      .eq('id', calDragEntryId).select().single()
-    if (!error && data) {
-      const idx = planEntries.findIndex(x => x.id === calDragEntryId)
-      if (idx !== -1) planEntries[idx] = data
-      renderPlan()
-    }
-    calDragEntryId = null
-  } else if (calDragRecipeId) {
-    const { data, error } = await sb.from('plan_entries').insert({
-      date, meal_type: mealType, recipe_id: calDragRecipeId, user_id: currentUser.id
-    }).select().single()
-    if (!error && data) { planEntries.push(data); renderPlan() }
-    calDragRecipeId = null
-  }
-}
-function onExtendDragStart(e, mealType, recipeId, spanEndDate) {
-  e.stopPropagation()
-  clearDragState()
-  calExtendRecipeId = recipeId
-  calExtendMealType = mealType
-  calExtendSpanEnd = spanEndDate
-  document.body.classList.add('dragging-active')
-  e.dataTransfer.effectAllowed = 'copy'
-}
-function onExtendDragEnd(e) {
-  document.body.classList.remove('dragging-active')
-  document.querySelectorAll('.cal-cell.extend-over').forEach(c => c.classList.remove('extend-over'))
   clearDragState()
 }
 function onPaletteDragStart(e, recipeId) {
@@ -1352,6 +1671,7 @@ function onPaletteDragStart(e, recipeId) {
   calDragRecipeId = recipeId
   document.body.classList.add('dragging-active')
   e.dataTransfer.effectAllowed = 'copy'
+  e.dataTransfer.setData('text/plain', String(recipeId))
   setTimeout(() => e.target.classList.add('dragging'), 0)
 }
 function renderPalette() {
@@ -1410,10 +1730,11 @@ function renderWeek() {
             const dk = dateKey(d)
             const isToday = dk === today
             const isPast = dk < today
-            return `<div class="cal-cell${isToday ? ' today-col' : isPast ? ' past-col' : ''}" data-meal="${mt.key}"
-              ondragover="onCalDragOver(event)"
-              ondragleave="onCalDragLeave(event)"
-              ondrop="onCalDrop(event,'${dk}','${mt.key}')">
+            return `<div class="cal-cell${isToday ? ' today-col' : isPast ? ' past-col' : ''}" data-date="${dk}" data-meal="${mt.key}">
+              <div class="cal-drop-zone"
+                ondragover="onDropZoneOver(event,'${dk}','${mt.key}')"
+                ondragleave="onDropZoneLeave(event)"
+                ondrop="onDropZoneDrop(event,'${dk}','${mt.key}')"></div>
               <button class="cal-add-btn" onclick="openAddModal('${dk}','${mt.key}','${mt.label}',${d.getDate()},'${RU_MONTHS_GEN[d.getMonth()]}')">+ добавить</button>
             </div>`
           }).join('')}
@@ -1421,18 +1742,24 @@ function renderWeek() {
             ${spans.map(span => {
               const r = recipes.find(x => x.id === span.rid)
               if (!r) return ''
-              const isSingle = span.startIdx === span.endIdx
               const eids = JSON.stringify(span.spanEntryIds)
+              const spanData = JSON.stringify({
+                entryIds: span.spanEntryIds,
+                recipeId: span.rid,
+                mealType: mt.key,
+                startDate: span.startDate,
+                endDate: span.endDate,
+              })
               const isPastSpan = span.endDate < today
               return `<div class="cal-chip ${mt.key}${isPastSpan ? ' past-chip' : ''}"
                 style="grid-column:${span.startIdx + 1}/${span.endIdx + 2}"
-                ${isSingle ? `draggable="true" ondragstart="onCalDragStart(event,${span.spanEntryIds[0]})" ondragend="onCalDragEnd(event)"` : ''}>
+                draggable="false"
+                onmousedown='onChipMouseDown(event,${spanData})'
+                onmousemove="onChipMouseMove(event)"
+                onmouseleave="onChipMouseLeave(event)"
+                onclick="onChipClick(event,${eids})">
                 <span class="cal-chip-name" title="${escHtml(r.name)}">${r.emoji || '🍽️'} ${escHtml(r.name)}</span>
-                <button class="cal-chip-rm" onclick="event.stopPropagation();removeSpan(${eids})">×</button>
-                <span class="cal-chip-extend" draggable="true"
-                  ondragstart="onExtendDragStart(event,'${mt.key}',${span.rid},'${span.endDate}')"
-                  ondragend="onExtendDragEnd(event)"
-                  title="Растянуть вправо">⟩</span>
+                <button class="cal-chip-rm-sel" onclick="event.stopPropagation();selectedSpanEntryIds=null;removeSpan(${eids})">×</button>
               </div>`
             }).join('')}
           </div>
@@ -1475,26 +1802,50 @@ function renderMonth() {
 
 function openAddModal(dk, mealKey, mealLabel, dayNum, monthName) {
   addCtx = { dk, mealKey }
+  addCatFilter = mealKey
   document.getElementById('add-modal-title').textContent = `Добавить в ${mealLabel.toLowerCase()}`
   document.getElementById('add-modal-sub').textContent = `${dayNum} ${monthName}`
   document.getElementById('add-search').value = ''
+  renderAddCatFilters()
   renderAddList()
   openModal('modal-add')
+}
+
+function renderAddCatFilters() {
+  const cats = [
+    { key: 'all', label: 'Все' },
+    { key: 'breakfast', label: 'Завтрак' },
+    { key: 'lunch', label: 'Обед' },
+    { key: 'dinner', label: 'Ужин' },
+    { key: 'snack', label: 'Перекус' },
+    { key: 'dessert', label: 'Десерт' },
+  ]
+  document.getElementById('add-cat-filters').innerHTML = cats.map(c =>
+    `<button class="cat-filter-btn${addCatFilter === c.key ? ' active' : ''}${c.key !== 'all' ? ' ' + c.key : ''}"
+      onclick="setAddCatFilter('${c.key}')">${c.label}</button>`
+  ).join('')
+}
+
+function setAddCatFilter(cat) {
+  addCatFilter = cat
+  renderAddCatFilters()
+  renderAddList()
 }
 
 function renderAddList() {
   const q = (document.getElementById('add-search')?.value || '').toLowerCase()
   const list = document.getElementById('add-list')
-  const f = recipes.filter(r => r.name.toLowerCase().includes(q) || CAT_LABELS[r.category]?.toLowerCase().includes(q))
+  let f = addCatFilter === 'all' ? recipes : recipes.filter(r => r.category === addCatFilter)
+  if (q) f = f.filter(r => r.name.toLowerCase().includes(q))
   if (!f.length) { list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Рецептов не найдено</div>'; return }
   list.innerHTML = f.map(r => `
     <div class="rsel-item" onclick="addMealToPlan(${r.id})">
       <span class="ri-emoji">${r.emoji || '🍽️'}</span>
       <div class="ri-info">
-        <div class="ri-name">${r.name}</div>
+        <div class="ri-name">${escHtml(r.name)}</div>
         <div class="ri-sub">${CAT_LABELS[r.category] || r.category}${r.cook_time ? ' · ' + r.cook_time + ' мин' : ''}</div>
       </div>
-      <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
+      ${addCatFilter === 'all' ? `<span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>` : ''}
     </div>`).join('')
 }
 
@@ -1735,13 +2086,117 @@ function closeFab() {
 
 // ─── AI SEARCH ───────────────────────────────────────
 function openAiSearch() {
-  document.getElementById('ai-name-input').value = ''
-  document.getElementById('ai-status').style.display = 'none'
-  const btn = document.getElementById('ai-btn')
-  btn.disabled = false
-  btn.textContent = '✨ Найти'
-  openModal('modal-ai')
-  setTimeout(() => document.getElementById('ai-name-input').focus(), 100)
+  openRecipeModal(null, 'ai')
+}
+
+async function fetchRecipeAI(name) {
+  const res = await fetch('/.netlify/functions/recipe-ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  })
+  if (!res.ok) throw new Error('API error')
+  return await res.json()
+}
+
+function getRecipeFormIngredients() {
+  return Array.from(document.querySelectorAll('#ingr-list .ingr-row')).map(row => {
+    const name = row.querySelector('input')?.value.trim()
+    const qty = row.querySelector('.ingr-qty')?.value.trim()
+    const unit = row.querySelector('.ingr-unit')?.value
+    const amount = qty ? `${qty} ${unit}` : ''
+    return { name, amount }
+  }).filter(i => i.name)
+}
+
+async function fetchRecipeDescriptionAI() {
+  const name = document.getElementById('r-name').value.trim()
+  if (!name) throw new Error('Missing name')
+  const recipe = {
+    category: document.getElementById('r-cat').value,
+    cook_time: parseInt(document.getElementById('r-time').value) || null,
+    servings: parseInt(document.getElementById('r-servings').value) || 2,
+    ingredients: getRecipeFormIngredients()
+  }
+  const res = await fetch('/.netlify/functions/recipe-ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, mode: 'description', recipe })
+  })
+  if (!res.ok) throw new Error('API error')
+  return await res.json()
+}
+
+async function generateDescriptionInForm() {
+  const name = document.getElementById('r-name').value.trim()
+  if (!name) { toast('Сначала введи название блюда'); document.getElementById('r-name').focus(); return }
+  const desc = document.getElementById('r-desc')
+  const btn = document.getElementById('desc-ai-btn')
+  const undoBtn = document.getElementById('desc-undo-btn')
+  const status = document.getElementById('desc-ai-status')
+  btn.disabled = true
+  btn.textContent = 'Генерируем...'
+  status.style.display = 'block'
+  status.textContent = 'ИИ пишет шаги по названию и ингредиентам...'
+  try {
+    const prev = desc.value
+    const data = await fetchRecipeDescriptionAI()
+    if (prev !== data.description) descUndoStack.push(prev)
+    desc.value = data.description || ''
+    undoBtn.style.display = descUndoStack.length ? 'inline-flex' : 'none'
+    status.textContent = 'Готово. Можно сохранить, вернуть текст или сгенерировать ещё раз.'
+    toast('Шаги сгенерированы')
+  } catch {
+    status.textContent = 'Не удалось сгенерировать шаги. Попробуй ещё раз.'
+  } finally {
+    btn.disabled = false
+    btn.textContent = '✨ Сгенерировать ещё'
+  }
+}
+
+function undoGeneratedDescription() {
+  if (!descUndoStack.length) return
+  document.getElementById('r-desc').value = descUndoStack.pop()
+  document.getElementById('desc-undo-btn').style.display = descUndoStack.length ? 'inline-flex' : 'none'
+  document.getElementById('desc-ai-status').style.display = 'block'
+  document.getElementById('desc-ai-status').textContent = 'Вернули предыдущую версию текста.'
+}
+
+function applyRecipeToForm(recipe, fallbackName = '') {
+  document.getElementById('r-name').value = recipe.name || fallbackName
+  document.getElementById('r-emoji').value = recipe.emoji || '🍽️'
+  document.getElementById('r-cat').value = recipe.category || 'lunch'
+  document.getElementById('r-time').value = recipe.cook_time || ''
+  document.getElementById('r-servings').value = recipe.servings || 2
+  document.getElementById('r-desc').value = recipe.description || ''
+  const il = document.getElementById('ingr-list')
+  il.innerHTML = ''
+  const ingredients = recipe.ingredients?.length ? recipe.ingredients : [{ name: '', amount: '' }]
+  ingredients.forEach(i => addIngrRow(i.name, i.amount))
+  document.getElementById('r-name').focus()
+}
+
+async function generateRecipeInForm() {
+  const aiInput = document.getElementById('recipe-ai-name')
+  const name = (aiInput.value || document.getElementById('r-name').value).trim()
+  if (!name) { toast('Введи название блюда'); aiInput.focus(); return }
+  const btn = document.getElementById('recipe-ai-btn')
+  const status = document.getElementById('recipe-ai-status')
+  btn.disabled = true
+  btn.textContent = 'Генерируем...'
+  status.style.display = 'block'
+  status.textContent = '✨ ИИ составляет рецепт...'
+  try {
+    const recipe = await fetchRecipeAI(name)
+    applyRecipeToForm(recipe, name)
+    status.textContent = 'Готово. Проверь рецепт и сохрани.'
+    toast('Рецепт сгенерирован')
+  } catch {
+    status.textContent = 'Ошибка. Попробуй ещё раз.'
+  } finally {
+    btn.disabled = false
+    btn.textContent = '✨ Сгенерировать'
+  }
 }
 
 async function searchRecipeAI() {
@@ -1754,24 +2209,10 @@ async function searchRecipeAI() {
   status.style.display = 'block'
   status.textContent = '✨ ИИ составляет рецепт...'
   try {
-    const res = await fetch('/.netlify/functions/recipe-ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name })
-    })
-    if (!res.ok) throw new Error('API error')
-    const recipe = await res.json()
+    const recipe = await fetchRecipeAI(name)
     closeModal('modal-ai')
     openRecipeModal()
-    document.getElementById('r-name').value = recipe.name || name
-    document.getElementById('r-emoji').value = recipe.emoji || '🍽️'
-    document.getElementById('r-cat').value = recipe.category || 'lunch'
-    document.getElementById('r-time').value = recipe.cook_time || ''
-    document.getElementById('r-servings').value = recipe.servings || 2
-    document.getElementById('r-desc').value = recipe.description || ''
-    const il = document.getElementById('ingr-list')
-    il.innerHTML = ''
-    ;(recipe.ingredients || []).forEach(i => addIngrRow(i.name, i.amount))
+    applyRecipeToForm(recipe, name)
     toast('Рецепт найден! Проверь и сохрани.')
   } catch {
     status.textContent = '❌ Ошибка. Попробуй ещё раз.'
