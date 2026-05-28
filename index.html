@@ -1081,15 +1081,45 @@ function openRecipeModal(id) {
 }
 
 const UNITS = ['г','кг','мл','л','шт.','ст.л.','ч.л.','щепотка','по вкусу']
+const UNIT_ALIASES = {
+  'гр':'г','гр.':'г','грамм':'г','граммов':'г','г.':'г',
+  'кг.':'кг','килограмм':'кг','килограммов':'кг',
+  'мл.':'мл','миллилитр':'мл','миллилитров':'мл',
+  'л.':'л','литр':'л','литров':'л',
+  'шт':'шт.','штук':'шт.','штуки':'шт.','штука':'шт.',
+  'ст. л.':'ст.л.','ст.л':'ст.л.','столовая ложка':'ст.л.','столовых ложек':'ст.л.','столовые ложки':'ст.л.',
+  'ч. л.':'ч.л.','ч.л':'ч.л.','чайная ложка':'ч.л.','чайных ложек':'ч.л.','чайные ложки':'ч.л.',
+}
+
+function normalizeUnit(u) {
+  const lo = u.toLowerCase().trim()
+  if (UNITS.includes(lo)) return lo
+  return UNIT_ALIASES[lo] || null
+}
 
 function parseAmount(amount) {
   if (!amount) return { qty: '', unit: 'г' }
-  const parts = amount.trim().split(/\s+/)
-  if (parts.length >= 2) {
-    const possibleUnit = parts.slice(1).join(' ')
-    if (UNITS.includes(possibleUnit)) return { qty: parts[0], unit: possibleUnit }
+  const s = amount.trim()
+
+  // Whole string is a no-qty unit (щепотка, по вкусу)
+  const unitOnly = normalizeUnit(s)
+  if (unitOnly) return { qty: '', unit: unitOnly }
+
+  const parts = s.split(/\s+/)
+  const firstIsNum = /^[\d.,/]+$/.test(parts[0])
+
+  if (firstIsNum) {
+    const rest = parts.slice(1).join(' ')
+    if (!rest) return { qty: parts[0], unit: 'г' }
+    const unit = normalizeUnit(rest)
+    return { qty: parts[0], unit: unit || 'г' }
   }
-  return { qty: amount, unit: 'г' }
+
+  // Multi-word non-numeric (shouldn't happen with proper AI output, best-effort)
+  const possibleUnit = normalizeUnit(parts.slice(1).join(' '))
+  if (possibleUnit) return { qty: parts[0], unit: possibleUnit }
+
+  return { qty: s, unit: 'г' }
 }
 
 function addIngrRow(name = '', amount = '') {
