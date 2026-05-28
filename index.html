@@ -304,13 +304,27 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 .cal-day-name { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-3); }
 .cal-day-num { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.2; margin-top: 2px; }
 .cal-day-head.today .cal-day-num { color: var(--accent); }
-.cal-meal-row { display: grid; grid-template-columns: 80px repeat(7, 1fr); border-top: 1px solid var(--border); }
-.cal-row-label { padding: 10px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; border-right: 1px solid var(--border); display: flex; align-items: flex-start; line-height: 1.3; }
+.cal-meal-row { display: grid; grid-template-columns: 80px repeat(7, 1fr); border-top: 1px solid var(--border); height: 86px; }
+.cal-row-label { padding: 10px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; border-right: 1px solid var(--border); display: flex; align-items: flex-start; line-height: 1.3; overflow: hidden; }
 .cal-row-label.breakfast { color: var(--breakfast-t); background: var(--breakfast); }
 .cal-row-label.lunch { color: var(--lunch-t); background: var(--lunch); }
 .cal-row-label.dinner { color: var(--dinner-t); background: var(--dinner); }
 .cal-row-label.snack { color: var(--snack-t); background: var(--snack); }
-.cal-cell { min-height: 72px; padding: 5px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; transition: background .12s; }
+.cal-cell { height: 86px; overflow: hidden; padding: 5px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; transition: background .12s; }
+/* ── RECIPE PALETTE ── */
+.recipe-palette { margin-top: 20px; }
+.palette-group { margin-bottom: 14px; }
+.palette-group-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); margin-bottom: 7px; }
+.palette-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.palette-chip { border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 500; cursor: grab; display: flex; align-items: center; gap: 5px; user-select: none; transition: opacity .15s, transform .12s, box-shadow .12s; white-space: nowrap; }
+.palette-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.palette-chip:active { cursor: grabbing; transform: none; }
+.palette-chip.dragging { opacity: .3; }
+.palette-chip.breakfast { background: var(--breakfast); color: var(--breakfast-t); }
+.palette-chip.lunch { background: var(--lunch); color: var(--lunch-t); }
+.palette-chip.dinner { background: var(--dinner); color: var(--dinner-t); }
+.palette-chip.snack { background: var(--snack); color: var(--snack-t); }
+.palette-chip.dessert { background: var(--dessert); color: var(--dessert-t); }
 .cal-cell.today-col { background: rgba(45,106,79,.04); }
 .cal-cell.drag-over { background: var(--accent-light) !important; outline: 2px solid var(--accent); outline-offset: -2px; }
 .cal-chip { border-radius: 5px; padding: 4px 6px; font-size: 11px; font-weight: 500; cursor: grab; display: flex; align-items: center; gap: 4px; user-select: none; transition: opacity .15s; }
@@ -637,6 +651,7 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
       </div>
     </div>
     <div id="plan-container"></div>
+    <div class="recipe-palette" id="recipe-palette"></div>
   </div>
 
   <!-- SHOPPING PAGE -->
@@ -1116,17 +1131,20 @@ function getEntriesForDay(dk) {
 
 function renderPlan() {
   viewMode === 'week' ? renderWeek() : renderMonth()
+  renderPalette()
 }
 
 let calDragEntryId = null
+let calDragRecipeId = null
 
 function onCalDragStart(e, entryId) {
   calDragEntryId = entryId
+  calDragRecipeId = null
   e.dataTransfer.effectAllowed = 'move'
   setTimeout(() => e.target.classList.add('dragging'), 0)
 }
 function onCalDragEnd(e) {
-  document.querySelectorAll('.cal-chip.dragging').forEach(c => c.classList.remove('dragging'))
+  document.querySelectorAll('.cal-chip.dragging,.palette-chip.dragging').forEach(c => c.classList.remove('dragging'))
   document.querySelectorAll('.cal-cell.drag-over').forEach(c => c.classList.remove('drag-over'))
 }
 function onCalDragOver(e) {
@@ -1135,24 +1153,54 @@ function onCalDragOver(e) {
   e.currentTarget.classList.add('drag-over')
 }
 function onCalDragLeave(e) {
-  if (!e.currentTarget.contains(e.relatedTarget)) {
-    e.currentTarget.classList.remove('drag-over')
-  }
+  if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.classList.remove('drag-over')
 }
 async function onCalDrop(e, date, mealType) {
   e.preventDefault()
   e.currentTarget.classList.remove('drag-over')
-  if (!calDragEntryId) return
-  const { data, error } = await sb.from('plan_entries')
-    .update({ date, meal_type: mealType })
-    .eq('id', calDragEntryId)
-    .select().single()
-  if (!error && data) {
-    const idx = planEntries.findIndex(x => x.id === calDragEntryId)
-    if (idx !== -1) planEntries[idx] = data
-    renderPlan()
+  if (calDragEntryId) {
+    const { data, error } = await sb.from('plan_entries')
+      .update({ date, meal_type: mealType })
+      .eq('id', calDragEntryId).select().single()
+    if (!error && data) {
+      const idx = planEntries.findIndex(x => x.id === calDragEntryId)
+      if (idx !== -1) planEntries[idx] = data
+      renderPlan()
+    }
+    calDragEntryId = null
+  } else if (calDragRecipeId) {
+    const { data, error } = await sb.from('plan_entries').insert({
+      date, meal_type: mealType, recipe_id: calDragRecipeId, user_id: currentUser.id
+    }).select().single()
+    if (!error && data) { planEntries.push(data); renderPlan() }
+    calDragRecipeId = null
   }
+}
+function onPaletteDragStart(e, recipeId) {
+  calDragRecipeId = recipeId
   calDragEntryId = null
+  e.dataTransfer.effectAllowed = 'copy'
+  setTimeout(() => e.target.classList.add('dragging'), 0)
+}
+function renderPalette() {
+  const el = document.getElementById('recipe-palette')
+  if (!el) return
+  if (!recipes.length || viewMode !== 'week') { el.innerHTML = ''; return }
+  const catOrder = ['breakfast','lunch','dinner','snack','dessert']
+  const grouped = {}
+  recipes.forEach(r => { if (!grouped[r.category]) grouped[r.category] = []; grouped[r.category].push(r) })
+  el.innerHTML = catOrder.filter(c => grouped[c]?.length).map(cat => `
+    <div class="palette-group">
+      <div class="palette-group-title">${CAT_LABELS[cat] || cat}</div>
+      <div class="palette-chips">
+        ${grouped[cat].map(r => `
+          <div class="palette-chip ${cat}" draggable="true"
+            ondragstart="onPaletteDragStart(event,${r.id})"
+            ondragend="onCalDragEnd(event)">
+            ${r.emoji || '🍽️'} ${escHtml(r.name)}
+          </div>`).join('')}
+      </div>
+    </div>`).join('')
 }
 
 function renderWeek() {
