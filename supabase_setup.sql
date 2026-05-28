@@ -11,9 +11,13 @@ create table recipes (
   emoji       text,
   category    text not null default 'lunch',
   cook_time   integer,
+  servings    integer default 2,
   description text,
   created_at  timestamptz default now()
 );
+
+-- Миграция для существующей БД (запусти если таблица уже создана):
+-- alter table recipes add column if not exists servings integer default 2;
 
 -- 2. Таблица ингредиентов
 create table ingredients (

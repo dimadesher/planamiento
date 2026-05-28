@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Меню — планировщик</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ── RESET & BASE ── */
@@ -38,7 +38,7 @@ body {
   min-height: 100vh;
   line-height: 1.5;
 }
-h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
+h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 
 /* ── AUTH SCREEN ── */
 .auth-screen {
@@ -58,8 +58,9 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
   box-shadow: var(--shadow);
 }
 .auth-logo {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 28px;
+  font-weight: 700;
   color: var(--accent);
   margin-bottom: 6px;
 }
@@ -138,7 +139,8 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
   z-index: 10;
 }
 .nav-brand {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
   font-size: 20px;
   color: var(--accent);
   margin-right: 32px;
@@ -270,7 +272,7 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
 
 /* ── PLAN ── */
 .plan-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-.period-label { font-family: 'Instrument Serif', serif; font-size: 20px; flex: 1; min-width: 180px; }
+.period-label { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 20px; flex: 1; min-width: 180px; }
 .mode-toggle { display: flex; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
 .mode-btn {
   padding: 7px 14px;
@@ -400,16 +402,24 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
 /* ── SHOPPING ── */
 .shop-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 20px; }
-.stat-num { font-family: 'Instrument Serif', serif; font-size: 28px; color: var(--accent); }
+.stat-num { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 28px; color: var(--accent); }
 .stat-lbl { font-size: 12px; color: var(--text-2); margin-top: 2px; }
 .shop-section { margin-bottom: 20px; }
 .shop-section-title { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 .shop-item { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
 .shop-item:last-child { border-bottom: none; }
 .shop-item input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
-.shop-item label { font-size: 14px; cursor: pointer; flex: 1; }
+.shop-item label { font-size: 14px; cursor: pointer; flex: 1; min-width: 0; }
 .shop-item label.checked { text-decoration: line-through; color: var(--text-3); }
-.shop-item .shop-amt { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+.shop-amt { font-size: 12px; color: var(--text-2); white-space: nowrap; cursor: text; border-radius: 4px; padding: 2px 6px; transition: background .12s; min-width: 24px; display: inline-block; text-align: right; }
+.shop-amt:hover { background: var(--bg); }
+.shop-amt:focus { background: var(--surface); outline: 1px solid var(--accent); outline-offset: 1px; }
+.shop-amt-empty { color: var(--text-3); font-style: italic; }
+.shop-rm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 17px; padding: 0 3px; line-height: 1; flex-shrink: 0; transition: color .12s; }
+.shop-rm:hover { color: var(--danger-t); }
+.shop-add-row { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.shop-add-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--r); font-family: 'Manrope', sans-serif; font-size: 14px; background: var(--surface); color: var(--text); outline: none; transition: border-color .15s; }
+.shop-add-row input:focus { border-color: var(--accent); }
 
 /* ── MODAL ── */
 .modal-overlay {
@@ -437,7 +447,7 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
   animation: modalIn .18s ease;
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
-.modal h3 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; margin-bottom: 20px; }
+.modal h3 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 20px; }
 .fg { margin-bottom: 14px; }
 .fg label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-2); margin-bottom: 5px; }
 .fg input, .fg select, .fg textarea {
@@ -454,9 +464,10 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
 }
 .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); background: var(--surface); }
 .fg textarea { height: 80px; resize: vertical; }
-.ingr-row { display: flex; gap: 8px; margin-bottom: 7px; align-items: center; }
-.ingr-row input { flex: 1; }
-.ingr-row input:nth-child(2) { width: 90px; flex: none; }
+.ingr-row { display: flex; gap: 6px; margin-bottom: 7px; align-items: center; }
+.ingr-row input { flex: 1; min-width: 0; }
+.ingr-row .ingr-qty { width: 60px; flex: none; }
+.ingr-row .ingr-unit { width: 90px; flex: none; padding: 9px 6px; font-size: 13px; }
 .ingr-rm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 20px; padding: 0 3px; transition: color .12s; }
 .ingr-rm:hover { color: var(--danger-t); }
 .modal-footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
@@ -498,7 +509,7 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
   gap: 12px;
   z-index: 300;
 }
-.loading-screen .logo { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--accent); }
+.loading-screen .logo { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 32px; color: var(--accent); }
 .loader { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -628,7 +639,10 @@ h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
         <option value="snack">Перекус</option>
       </select>
     </div>
-    <div class="fg"><label>Время (мин)</label><input type="number" id="r-time" placeholder="30" style="width:90px"></div>
+    <div style="display:flex;gap:12px">
+      <div class="fg" style="flex:1"><label>Время (мин)</label><input type="number" id="r-time" placeholder="30"></div>
+      <div class="fg" style="flex:1"><label>Порций</label><input type="number" id="r-servings" placeholder="2" min="1" max="20"></div>
+    </div>
     <div class="fg">
       <label>Ингредиенты</label>
       <div id="ingr-list"></div>
@@ -688,6 +702,7 @@ let currentUser = null
 let recipes = []
 let planEntries = [] // { id, date, meal_type, recipe_id }
 let shopping = {}
+let customShoppingItems = {}
 let editingId = null
 let addCtx = null
 let viewMode = 'week'
@@ -758,7 +773,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    if (event === 'SIGNED_IN' && session && !currentUser) {
       document.getElementById('auth-screen').style.display = 'none'
       document.getElementById('loading-screen').style.display = 'flex'
       await initApp(session.user)
@@ -808,15 +823,34 @@ function renderRecipes() {
     </div>`).join('')
 }
 
+let detailBaseServings = 2
+let detailCurrentServings = 2
+
 function openDetail(id) {
   const r = recipes.find(x => x.id === id)
   if (!r) return
+  detailBaseServings = r.servings || 2
+  detailCurrentServings = detailBaseServings
+
+  const ingrRows = (r.ingredients || []).map(i => {
+    const p = i.amount ? parseQtyUnit(i.amount) : null
+    const hasNum = p && p.qty !== null
+    return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span>${escHtml(i.name)}</span>
+      <span class="detail-amt" style="color:var(--text-2)"
+        data-base="${hasNum ? p.qty : ''}"
+        data-unit="${escHtml(hasNum ? p.unit : '')}"
+        data-raw="${escHtml(i.amount || '')}"
+      >${escHtml(i.amount || '')}</span>
+    </div>`
+  }).join('')
+
   document.getElementById('modal-detail-body').innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:14px">
         <span style="font-size:36px">${r.emoji || '🍽️'}</span>
         <div>
-          <div style="font-size:18px;font-weight:600;margin-bottom:6px">${r.name}</div>
+          <div style="font-size:18px;font-weight:600;margin-bottom:6px">${escHtml(r.name)}</div>
           <div style="display:flex;gap:8px;align-items:center">
             <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
             ${r.cook_time ? `<span style="font-size:12px;color:var(--text-2)">⏱ ${r.cook_time} мин</span>` : ''}
@@ -827,18 +861,40 @@ function openDetail(id) {
     </div>
     ${r.ingredients?.length ? `
       <div style="background:var(--bg);border-radius:var(--r);padding:14px;margin-bottom:14px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px">Ингредиенты</div>
-        ${r.ingredients.map(i => `
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
-            <span>${i.name}</span><span style="color:var(--text-2)">${i.amount || ''}</span>
-          </div>`).join('')}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3)">Ингредиенты</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button onclick="changeDetailServings(-1)" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:16px;line-height:1;color:var(--text-2)">−</button>
+            <span style="font-size:13px;font-weight:600;min-width:60px;text-align:center"><span id="detail-servings">${detailCurrentServings}</span> чел.</span>
+            <button onclick="changeDetailServings(1)" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:16px;line-height:1;color:var(--text-2)">+</button>
+          </div>
+        </div>
+        ${ingrRows}
       </div>` : ''}
-    ${r.description ? `<div style="font-size:13px;line-height:1.7;color:var(--text-2);margin-bottom:18px">${r.description}</div>` : ''}
+    ${r.description ? `<div style="font-size:13px;line-height:1.7;color:var(--text-2);margin-bottom:18px">${escHtml(r.description)}</div>` : ''}
     <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">
       <button class="btn-danger-ghost" onclick="deleteRecipe(${r.id})">🗑 Удалить</button>
       <button class="btn-ghost btn-sm" onclick="closeModal('modal-detail');openRecipeModal(${r.id})">✏️ Изменить</button>
     </div>`
   openModal('modal-detail')
+}
+
+function changeDetailServings(delta) {
+  detailCurrentServings = Math.max(1, detailCurrentServings + delta)
+  const el = document.getElementById('detail-servings')
+  if (el) el.textContent = detailCurrentServings
+  document.querySelectorAll('.detail-amt').forEach(span => {
+    const base = parseFloat(span.dataset.base)
+    const unit = span.dataset.unit
+    const raw = span.dataset.raw
+    if (!isNaN(base) && base > 0) {
+      const scaled = base * detailCurrentServings / detailBaseServings
+      const n = scaled % 1 === 0 ? scaled : +scaled.toFixed(1)
+      span.textContent = unit ? `${n} ${unit}` : String(n)
+    } else {
+      span.textContent = raw
+    }
+  })
 }
 
 async function deleteRecipe(id) {
@@ -861,6 +917,7 @@ function openRecipeModal(id) {
   document.getElementById('r-name').value = r?.name || ''
   document.getElementById('r-cat').value = r?.category || 'breakfast'
   document.getElementById('r-time').value = r?.cook_time || ''
+  document.getElementById('r-servings').value = r?.servings || 2
   document.getElementById('r-desc').value = r?.description || ''
   const il = document.getElementById('ingr-list')
   il.innerHTML = ''
@@ -869,11 +926,28 @@ function openRecipeModal(id) {
   openModal('modal-recipe')
 }
 
+const UNITS = ['г','кг','мл','л','шт.','ст.л.','ч.л.','щепотка','по вкусу']
+
+function parseAmount(amount) {
+  if (!amount) return { qty: '', unit: 'г' }
+  const parts = amount.trim().split(/\s+/)
+  if (parts.length >= 2) {
+    const possibleUnit = parts.slice(1).join(' ')
+    if (UNITS.includes(possibleUnit)) return { qty: parts[0], unit: possibleUnit }
+  }
+  return { qty: amount, unit: 'г' }
+}
+
 function addIngrRow(name = '', amount = '') {
+  const { qty, unit } = parseAmount(amount)
   const il = document.getElementById('ingr-list')
   const row = document.createElement('div')
   row.className = 'ingr-row'
-  row.innerHTML = `<input type="text" placeholder="Ингредиент" value="${name}"><input type="text" placeholder="Кол-во" value="${amount}" style="width:90px;flex:none"><button class="ingr-rm" onclick="this.parentElement.remove()" aria-label="Удалить">×</button>`
+  row.innerHTML = `
+    <input type="text" placeholder="Ингредиент" value="${name}">
+    <input type="text" class="ingr-qty" placeholder="0" value="${qty}">
+    <select class="ingr-unit">${UNITS.map(u => `<option value="${u}"${u === unit ? ' selected' : ''}>${u}</option>`).join('')}</select>
+    <button class="ingr-rm" onclick="this.parentElement.remove()" aria-label="Удалить">×</button>`
   il.appendChild(row)
 }
 
@@ -881,8 +955,11 @@ async function saveRecipe() {
   const name = document.getElementById('r-name').value.trim()
   if (!name) { toast('Введи название рецепта'); return }
   const ingredients = Array.from(document.querySelectorAll('#ingr-list .ingr-row')).map(row => {
-    const inputs = row.querySelectorAll('input')
-    return { name: inputs[0].value.trim(), amount: inputs[1].value.trim() }
+    const name = row.querySelector('input').value.trim()
+    const qty = row.querySelector('.ingr-qty').value.trim()
+    const unit = row.querySelector('.ingr-unit').value
+    const amount = qty ? `${qty} ${unit}` : ''
+    return { name, amount }
   }).filter(i => i.name)
 
   const payload = {
@@ -890,6 +967,7 @@ async function saveRecipe() {
     emoji: document.getElementById('r-emoji').value || '🍽️',
     category: document.getElementById('r-cat').value,
     cook_time: parseInt(document.getElementById('r-time').value) || null,
+    servings: parseInt(document.getElementById('r-servings').value) || 2,
     description: document.getElementById('r-desc').value.trim() || null,
     user_id: currentUser.id
   }
@@ -1069,7 +1147,31 @@ async function removeMeal(entryId) {
 }
 
 // ─── SHOPPING ────────────────────────────────────────
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+function parseQtyUnit(amount) {
+  const m = amount.trim().match(/^([\d.,]+)\s*(.*)$/)
+  if (m) {
+    const qty = parseFloat(m[1].replace(',', '.'))
+    if (!isNaN(qty)) return { qty, unit: m[2].trim() }
+  }
+  return { qty: null, unit: amount.trim() }
+}
+
+function formatSums(sums, extras) {
+  const parts = []
+  for (const [unit, qty] of Object.entries(sums)) {
+    const n = qty % 1 === 0 ? qty : +qty.toFixed(1)
+    parts.push(unit ? `${n} ${unit}` : String(n))
+  }
+  parts.push(...[...new Set(extras)])
+  return parts.join(' + ')
+}
+
 async function genShopping() {
+  const prev = shopping
   const all = {}
   planEntries.forEach(e => {
     const r = recipes.find(x => x.id === e.recipe_id)
@@ -1077,52 +1179,93 @@ async function genShopping() {
     ;(r.ingredients || []).forEach(i => {
       if (!i.name) return
       const k = i.name.toLowerCase().trim()
-      if (!all[k]) all[k] = { name: i.name, amounts: [], checked: false }
-      if (i.amount) all[k].amounts.push(i.amount)
+      if (!all[k]) all[k] = { name: i.name, sums: {}, extras: [], amount: '', checked: prev[k]?.checked || false }
+      if (i.amount) {
+        const p = parseQtyUnit(i.amount)
+        if (p.qty !== null) {
+          all[k].sums[p.unit] = (all[k].sums[p.unit] || 0) + p.qty
+        } else {
+          if (!all[k].extras.includes(i.amount)) all[k].extras.push(i.amount)
+        }
+      }
     })
   })
-  shopping = all
+  for (const k in all) all[k].amount = formatSums(all[k].sums, all[k].extras)
+  shopping = { ...all }
+  for (const k in customShoppingItems) shopping[k] = customShoppingItems[k]
   renderShopping()
   toast('Список обновлён!')
 }
 
 function renderShopping() {
   const el = document.getElementById('shopping-content')
-  const items = Object.values(shopping)
+  const allItems = Object.values(shopping)
+  const keys = Object.keys(shopping)
   const totalMeals = planEntries.length
-  const checked = items.filter(i => i.checked).length
+  const checked = allItems.filter(i => i.checked).length
 
-  if (!items.length) {
+  if (!allItems.length) {
     const hasPlan = planEntries.length > 0
     el.innerHTML = `<div class="empty-state"><div class="es-icon">🛒</div><p>${hasPlan ? 'Нажми «Обновить из плана» чтобы собрать список' : 'Сначала добавь блюда в планировщик'}</p></div>`
     return
   }
   el.innerHTML = `
     <div class="shop-stats">
-      <div class="stat-card"><div class="stat-num">${items.length}</div><div class="stat-lbl">позиций</div></div>
+      <div class="stat-card"><div class="stat-num">${allItems.length}</div><div class="stat-lbl">позиций</div></div>
       <div class="stat-card"><div class="stat-num">${totalMeals}</div><div class="stat-lbl">блюд в плане</div></div>
-      <div class="stat-card"><div class="stat-num">${checked}/${items.length}</div><div class="stat-lbl">куплено</div></div>
+      <div class="stat-card"><div class="stat-num">${checked}/${allItems.length}</div><div class="stat-lbl">куплено</div></div>
     </div>
     <div class="shop-section">
       <div class="shop-section-title">Продукты</div>
-      ${items.map((item, i) => {
-        const k = Object.keys(shopping)[i]
-        const uniqAmts = [...new Set(item.amounts)]
+      ${allItems.map((item, i) => {
+        const k = keys[i]
+        const amt = item.amount || ''
         return `<div class="shop-item">
-          <input type="checkbox" id="si${i}" ${item.checked ? 'checked' : ''} onchange="toggleShop('${k}',this.checked,${i})">
-          <label for="si${i}" class="${item.checked ? 'checked' : ''}">${item.name}</label>
-          ${uniqAmts.length ? `<span class="shop-amt">${uniqAmts.join(', ')}</span>` : ''}
+          <input type="checkbox" id="si${i}" ${item.checked ? 'checked' : ''} onchange="toggleShop('${k}',this.checked)">
+          <label for="si${i}" class="${item.checked ? 'checked' : ''}">${escHtml(item.name)}</label>
+          <span class="shop-amt${amt ? '' : ' shop-amt-empty'}" contenteditable="true" spellcheck="false" onblur="editShopAmt(event,'${k}')">${escHtml(amt || '—')}</span>
+          <button class="shop-rm" onclick="removeShopItem('${k}')" title="Убрать">×</button>
         </div>`
       }).join('')}
+      <div class="shop-add-row">
+        <input type="text" id="custom-item-name" placeholder="Добавить продукт..." onkeydown="if(event.key==='Enter')addCustomShopItem()">
+        <button class="btn-ghost btn-sm" onclick="addCustomShopItem()">+ Добавить</button>
+      </div>
     </div>`
 }
 
-function toggleShop(k, checked, i) {
+function toggleShop(k, checked) {
   if (shopping[k]) shopping[k].checked = checked
-  const lbl = document.querySelector(`#si${i} ~ label, label[for="si${i}"]`)
-  if (lbl) lbl.className = checked ? 'checked' : ''
   const stat = document.querySelector('.stat-card:nth-child(3) .stat-num')
-  if (stat) { const c = Object.values(shopping).filter(x => x.checked).length; stat.textContent = `${c}/${Object.keys(shopping).length}` }
+  if (stat) {
+    const c = Object.values(shopping).filter(x => x.checked).length
+    stat.textContent = `${c}/${Object.keys(shopping).length}`
+  }
+}
+
+function editShopAmt(e, k) {
+  const val = e.target.textContent.trim()
+  if (shopping[k]) shopping[k].amount = val === '—' ? '' : val
+  if (customShoppingItems[k]) customShoppingItems[k].amount = shopping[k].amount
+}
+
+function removeShopItem(k) {
+  delete shopping[k]
+  delete customShoppingItems[k]
+  renderShopping()
+}
+
+function addCustomShopItem() {
+  const input = document.getElementById('custom-item-name')
+  const name = input?.value.trim()
+  if (!name) return
+  const k = name.toLowerCase().trim()
+  const item = { name, sums: {}, extras: [], amount: '', checked: false }
+  shopping[k] = item
+  customShoppingItems[k] = item
+  input.value = ''
+  renderShopping()
+  toast(`${name} добавлен`)
 }
 
 // ─── UTILS ───────────────────────────────────────────
