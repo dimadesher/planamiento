@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -411,10 +412,12 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 .shop-item input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
 .shop-item label { font-size: 14px; cursor: pointer; flex: 1; min-width: 0; }
 .shop-item label.checked { text-decoration: line-through; color: var(--text-3); }
-.shop-amt { font-size: 12px; color: var(--text-2); white-space: nowrap; cursor: text; border-radius: 4px; padding: 2px 6px; transition: background .12s; min-width: 24px; display: inline-block; text-align: right; }
-.shop-amt:hover { background: var(--bg); }
-.shop-amt:focus { background: var(--surface); outline: 1px solid var(--accent); outline-offset: 1px; }
-.shop-amt-empty { color: var(--text-3); font-style: italic; }
+.shop-stepper { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.shop-stepper button { width: 24px; height: 24px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; font-size: 15px; line-height: 1; color: var(--text-2); transition: all .12s; display: flex; align-items: center; justify-content: center; padding: 0; }
+.shop-stepper button:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.shop-stepper-val { font-size: 13px; font-weight: 600; color: var(--text); min-width: 28px; text-align: center; white-space: nowrap; }
+.shop-unit-sel { border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-family: 'Manrope', sans-serif; font-size: 11px; color: var(--text-2); padding: 3px 4px; cursor: pointer; outline: none; transition: border-color .12s; max-width: 72px; }
+.shop-unit-sel:focus { border-color: var(--accent); }
 .shop-rm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 17px; padding: 0 3px; line-height: 1; flex-shrink: 0; transition: color .12s; }
 .shop-rm:hover { color: var(--danger-t); }
 .shop-add-row { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
@@ -448,6 +451,10 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 }
 @keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
 .modal h3 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+#modal-detail-body { max-width: 820px; padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.detail-cols { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.detail-left { width: 260px; flex-shrink: 0; border-right: 1px solid var(--border); padding: 18px 20px; overflow-y: auto; }
+.detail-right { flex: 1; min-width: 0; padding: 18px 24px; overflow-y: auto; }
 .fg { margin-bottom: 14px; }
 .fg label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-2); margin-bottom: 5px; }
 .fg input, .fg select, .fg textarea {
@@ -480,6 +487,33 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
 .rsel-item .ri-name { font-size: 13px; font-weight: 600; }
 .rsel-item .ri-sub { font-size: 11px; color: var(--text-2); }
 
+.fab-wrap { position: fixed; bottom: 28px; right: 28px; z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.fab-menu { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .18s, transform .18s; }
+.fab-menu.open { opacity: 1; transform: none; pointer-events: auto; }
+.fab-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 8px 16px; cursor: pointer; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 500; color: var(--text); box-shadow: var(--shadow); transition: all .15s; white-space: nowrap; }
+.fab-item:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.fab-item-icon { font-size: 17px; flex-shrink: 0; }
+.fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  transition: background .15s, transform .2s, box-shadow .15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.fab:hover { background: #1B4332; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.fab.open { transform: rotate(45deg); }
+.fab-backdrop { display: none; position: fixed; inset: 0; z-index: 49; }
+.fab-backdrop.open { display: block; }
 .toast {
   position: fixed;
   bottom: 24px;
@@ -510,6 +544,20 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
   z-index: 300;
 }
 .loading-screen .logo { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 32px; color: var(--accent); }
+.md-content { font-size: 13px; line-height: 1.7; color: var(--text-2); }
+.md-content h1, .md-content h2, .md-content h3 { font-weight: 700; color: var(--text); margin: 14px 0 6px; }
+.md-content h1 { font-size: 15px; }
+.md-content h2 { font-size: 14px; }
+.md-content h3 { font-size: 13px; }
+.md-content p { margin-bottom: 8px; }
+.md-content ul, .md-content ol { padding-left: 18px; margin-bottom: 8px; }
+.md-content li { margin-bottom: 3px; }
+.md-content strong { font-weight: 700; color: var(--text); }
+.md-content code { background: var(--bg); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: monospace; font-size: 12px; }
+.md-content pre { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); padding: 12px; overflow-x: auto; margin-bottom: 8px; }
+.md-content pre code { background: none; border: none; padding: 0; }
+.md-content blockquote { border-left: 3px solid var(--accent); padding-left: 12px; color: var(--text-3); margin: 8px 0; }
+.md-content hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 .loader { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
@@ -625,6 +673,19 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
   </div>
 </div>
 
+<div class="fab-backdrop" id="fab-backdrop" onclick="closeFab()"></div>
+<div class="fab-wrap">
+  <div class="fab-menu" id="fab-menu">
+    <button class="fab-item" onclick="openAiSearch();closeFab()">
+      <span class="fab-item-icon">✨</span>Найти через ИИ
+    </button>
+    <button class="fab-item" onclick="openRecipeModal();closeFab()">
+      <span class="fab-item-icon">✏️</span>Добавить вручную
+    </button>
+  </div>
+  <button class="fab" id="fab-main" onclick="toggleFab()">+</button>
+</div>
+
 <!-- MODAL: recipe form -->
 <div class="modal-overlay" id="modal-recipe">
   <div class="modal">
@@ -670,6 +731,22 @@ h1, h2 { font-family: 'Manrope', sans-serif; font-weight: 700; }
     <div class="recipe-select-list" id="add-list"></div>
     <div class="modal-footer">
       <button class="btn-ghost" onclick="closeModal('modal-add')">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: AI recipe search -->
+<div class="modal-overlay" id="modal-ai">
+  <div class="modal" style="max-width:400px">
+    <h3>Найти рецепт через ИИ</h3>
+    <div class="fg">
+      <label>Название блюда</label>
+      <input type="text" id="ai-name-input" placeholder="Тирамису, Борщ, Паста карбонара..." onkeydown="if(event.key==='Enter')searchRecipeAI()">
+    </div>
+    <div id="ai-status" style="font-size:13px;color:var(--text-2);margin-bottom:4px;display:none"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-ai')">Отмена</button>
+      <button class="btn-accent" id="ai-btn" onclick="searchRecipeAI()">✨ Найти</button>
     </div>
   </div>
 </div>
@@ -835,9 +912,9 @@ function openDetail(id) {
   const ingrRows = (r.ingredients || []).map(i => {
     const p = i.amount ? parseQtyUnit(i.amount) : null
     const hasNum = p && p.qty !== null
-    return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
-      <span>${escHtml(i.name)}</span>
-      <span class="detail-amt" style="color:var(--text-2)"
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span style="flex:1;min-width:0">${escHtml(i.name)}</span>
+      <span class="detail-amt" style="color:var(--text-2);flex-shrink:0;font-weight:500"
         data-base="${hasNum ? p.qty : ''}"
         data-unit="${escHtml(hasNum ? p.unit : '')}"
         data-raw="${escHtml(i.amount || '')}"
@@ -845,34 +922,43 @@ function openDetail(id) {
     </div>`
   }).join('')
 
+  const descHtml = r.description
+    ? `<div class="md-content">${marked.parse(r.description, { breaks: true })}</div>`
+    : `<p style="font-size:13px;color:var(--text-3)">Описание не добавлено</p>`
+
   document.getElementById('modal-detail-body').innerHTML = `
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:14px">
-        <span style="font-size:36px">${r.emoji || '🍽️'}</span>
-        <div>
-          <div style="font-size:18px;font-weight:600;margin-bottom:6px">${escHtml(r.name)}</div>
-          <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:14px;min-width:0">
+        <span style="font-size:34px;flex-shrink:0">${r.emoji || '🍽️'}</span>
+        <div style="min-width:0">
+          <div style="font-size:17px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(r.name)}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
             ${r.cook_time ? `<span style="font-size:12px;color:var(--text-2)">⏱ ${r.cook_time} мин</span>` : ''}
+            ${r.servings ? `<span style="font-size:12px;color:var(--text-2)">👥 ${r.servings} чел.</span>` : ''}
           </div>
         </div>
       </div>
-      <button class="btn-ghost btn-sm" onclick="closeModal('modal-detail')" style="flex-shrink:0">✕</button>
+      <button class="btn-ghost btn-sm" onclick="closeModal('modal-detail')" style="flex-shrink:0;margin-left:12px">✕</button>
     </div>
-    ${r.ingredients?.length ? `
-      <div style="background:var(--bg);border-radius:var(--r);padding:14px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="detail-cols">
+      <div class="detail-left">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3)">Ингредиенты</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button onclick="changeDetailServings(-1)" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:16px;line-height:1;color:var(--text-2)">−</button>
-            <span style="font-size:13px;font-weight:600;min-width:60px;text-align:center"><span id="detail-servings">${detailCurrentServings}</span> чел.</span>
-            <button onclick="changeDetailServings(1)" style="width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:16px;line-height:1;color:var(--text-2)">+</button>
+          <div style="display:flex;align-items:center;gap:5px">
+            <button onclick="changeDetailServings(-1)" style="width:22px;height:22px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:14px;line-height:1;color:var(--text-2);display:flex;align-items:center;justify-content:center">−</button>
+            <span style="font-size:12px;font-weight:600;min-width:48px;text-align:center"><span id="detail-servings">${detailCurrentServings}</span> чел.</span>
+            <button onclick="changeDetailServings(1)" style="width:22px;height:22px;border:1px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;font-size:14px;line-height:1;color:var(--text-2);display:flex;align-items:center;justify-content:center">+</button>
           </div>
         </div>
-        ${ingrRows}
-      </div>` : ''}
-    ${r.description ? `<div style="font-size:13px;line-height:1.7;color:var(--text-2);margin-bottom:18px">${escHtml(r.description)}</div>` : ''}
-    <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">
+        ${r.ingredients?.length ? ingrRows : '<p style="font-size:13px;color:var(--text-3)">Не указаны</p>'}
+      </div>
+      <div class="detail-right">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px">Способ приготовления</div>
+        ${descHtml}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;padding:14px 24px;border-top:1px solid var(--border);flex-shrink:0">
       <button class="btn-danger-ghost" onclick="deleteRecipe(${r.id})">🗑 Удалить</button>
       <button class="btn-ghost btn-sm" onclick="closeModal('modal-detail');openRecipeModal(${r.id})">✏️ Изменить</button>
     </div>`
@@ -1219,12 +1305,19 @@ function renderShopping() {
       <div class="shop-section-title">Продукты</div>
       ${allItems.map((item, i) => {
         const k = keys[i]
-        const amt = item.amount || ''
+        const p = item.amount && item.amount !== '—' ? parseQtyUnit(item.amount) : { qty: null, unit: 'г' }
+        const qtyVal = p.qty !== null ? (p.qty % 1 === 0 ? p.qty : +p.qty.toFixed(1)) : 0
+        const unitVal = p.unit || 'г'
+        const unitOpts = UNITS.map(u => `<option value="${u}"${u === unitVal ? ' selected' : ''}>${u}</option>`).join('')
         return `<div class="shop-item">
           <input type="checkbox" id="si${i}" ${item.checked ? 'checked' : ''} onchange="toggleShop('${k}',this.checked)">
           <label for="si${i}" class="${item.checked ? 'checked' : ''}">${escHtml(item.name)}</label>
-          <span class="shop-amt${amt ? '' : ' shop-amt-empty'}" contenteditable="true" spellcheck="false" onblur="editShopAmt(event,'${k}')">${escHtml(amt || '—')}</span>
-          <button class="shop-rm" onclick="removeShopItem('${k}')" title="Убрать">×</button>
+          <div class="shop-stepper">
+            <button onclick="stepShopAmt(${i},-1)">−</button>
+            <span class="shop-stepper-val" id="sa-${i}">${qtyVal || '—'}</span>
+            <button onclick="stepShopAmt(${i},1)">+</button>
+            <select class="shop-unit-sel" id="su-${i}" onchange="changeShopUnit(${i},this.value)">${unitOpts}</select>
+          </div>
         </div>`
       }).join('')}
       <div class="shop-add-row">
@@ -1243,10 +1336,40 @@ function toggleShop(k, checked) {
   }
 }
 
-function editShopAmt(e, k) {
-  const val = e.target.textContent.trim()
-  if (shopping[k]) shopping[k].amount = val === '—' ? '' : val
-  if (customShoppingItems[k]) customShoppingItems[k].amount = shopping[k].amount
+function getStep(unit) {
+  if (['г', 'мл'].includes(unit)) return 50
+  if (['кг', 'л'].includes(unit)) return 0.5
+  return 1
+}
+
+function stepShopAmt(idx, delta) {
+  const keys = Object.keys(shopping)
+  const k = keys[idx]
+  const item = shopping[k]
+  if (!item) return
+  const unitSel = document.getElementById('su-' + idx)
+  const unit = unitSel ? unitSel.value : (parseQtyUnit(item.amount || '')?.unit || 'г')
+  const p = item.amount && item.amount !== '—' ? parseQtyUnit(item.amount) : { qty: 0, unit }
+  const qty = p.qty !== null ? p.qty : 0
+  const step = getStep(unit)
+  const newQty = Math.max(0, +(qty + delta * step).toFixed(2))
+  const n = newQty % 1 === 0 ? newQty : +newQty.toFixed(1)
+  item.amount = `${n} ${unit}`
+  if (customShoppingItems[k]) customShoppingItems[k].amount = item.amount
+  const span = document.getElementById('sa-' + idx)
+  if (span) span.textContent = n || '—'
+}
+
+function changeShopUnit(idx, unit) {
+  const keys = Object.keys(shopping)
+  const k = keys[idx]
+  const item = shopping[k]
+  if (!item) return
+  const p = item.amount && item.amount !== '—' ? parseQtyUnit(item.amount) : { qty: 0, unit: 'г' }
+  const qty = p.qty !== null ? p.qty : 0
+  const n = qty % 1 === 0 ? qty : +qty.toFixed(1)
+  item.amount = `${n} ${unit}`
+  if (customShoppingItems[k]) customShoppingItems[k].amount = item.amount
 }
 
 function removeShopItem(k) {
@@ -1266,6 +1389,69 @@ function addCustomShopItem() {
   input.value = ''
   renderShopping()
   toast(`${name} добавлен`)
+}
+
+// ─── FAB ─────────────────────────────────────────────
+function toggleFab() {
+  const menu = document.getElementById('fab-menu')
+  const btn = document.getElementById('fab-main')
+  const backdrop = document.getElementById('fab-backdrop')
+  const isOpen = menu.classList.contains('open')
+  menu.classList.toggle('open', !isOpen)
+  btn.classList.toggle('open', !isOpen)
+  backdrop.classList.toggle('open', !isOpen)
+}
+function closeFab() {
+  document.getElementById('fab-menu').classList.remove('open')
+  document.getElementById('fab-main').classList.remove('open')
+  document.getElementById('fab-backdrop').classList.remove('open')
+}
+
+// ─── AI SEARCH ───────────────────────────────────────
+function openAiSearch() {
+  document.getElementById('ai-name-input').value = ''
+  document.getElementById('ai-status').style.display = 'none'
+  const btn = document.getElementById('ai-btn')
+  btn.disabled = false
+  btn.textContent = '✨ Найти'
+  openModal('modal-ai')
+  setTimeout(() => document.getElementById('ai-name-input').focus(), 100)
+}
+
+async function searchRecipeAI() {
+  const name = document.getElementById('ai-name-input').value.trim()
+  if (!name) return
+  const btn = document.getElementById('ai-btn')
+  const status = document.getElementById('ai-status')
+  btn.disabled = true
+  btn.textContent = 'Ищем...'
+  status.style.display = 'block'
+  status.textContent = '✨ ИИ составляет рецепт...'
+  try {
+    const res = await fetch('/.netlify/functions/recipe-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    })
+    if (!res.ok) throw new Error('API error')
+    const recipe = await res.json()
+    closeModal('modal-ai')
+    openRecipeModal()
+    document.getElementById('r-name').value = recipe.name || name
+    document.getElementById('r-emoji').value = recipe.emoji || '🍽️'
+    document.getElementById('r-cat').value = recipe.category || 'lunch'
+    document.getElementById('r-time').value = recipe.cook_time || ''
+    document.getElementById('r-servings').value = recipe.servings || 2
+    document.getElementById('r-desc').value = recipe.description || ''
+    const il = document.getElementById('ingr-list')
+    il.innerHTML = ''
+    ;(recipe.ingredients || []).forEach(i => addIngrRow(i.name, i.amount))
+    toast('Рецепт найден! Проверь и сохрани.')
+  } catch {
+    status.textContent = '❌ Ошибка. Попробуй ещё раз.'
+    btn.disabled = false
+    btn.textContent = '✨ Найти'
+  }
 }
 
 // ─── UTILS ───────────────────────────────────────────
