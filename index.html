@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Меню — планировщик</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --border: #E8E4DC;
+  --border-strong: #C8C2B4;
+  --text: #1A1814;
+  --text-2: #6B6560;
+  --text-3: #A09A92;
+  --accent: #2D6A4F;
+  --accent-light: #E8F4EE;
+  --accent-text: #1B4332;
+  --breakfast: #FDF3E3; --breakfast-t: #7D4E17;
+  --lunch: #E8F4EE; --lunch-t: #1B4332;
+  --dinner: #EAF0FB; --dinner-t: #1A3A6B;
+  --snack: #FAE8F0; --snack-t: #6B1A3A;
+  --danger: #FEE2E2; --danger-t: #991B1B;
+  --r: 10px;
+  --r-lg: 16px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+}
+body {
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+h1, h2 { font-family: 'Instrument Serif', serif; font-weight: 400; }
+
+/* ── AUTH SCREEN ── */
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow);
+}
+.auth-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.auth-sub {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 32px;
+}
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: none;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-2);
+  transition: all .15s;
+}
+.auth-tab.active { background: var(--accent); color: #fff; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; letter-spacing: .03em; text-transform: uppercase; }
+.form-group input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color .15s;
+  outline: none;
+}
+.form-group input:focus { border-color: var(--accent); background: var(--surface); }
+.auth-error { background: var(--danger); color: var(--danger-t); padding: 10px 14px; border-radius: var(--r); font-size: 13px; margin-bottom: 14px; display: none; }
+.auth-error.show { display: block; }
+.btn-full {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-full:hover { background: #1B4332; }
+.btn-full:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── APP LAYOUT ── */
+.app { display: none; min-height: 100vh; flex-direction: column; }
+.app.visible { display: flex; }
+.topnav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.nav-brand {
+  font-family: 'Instrument Serif', serif;
+  font-size: 20px;
+  color: var(--accent);
+  margin-right: 32px;
+  flex-shrink: 0;
+}
+.nav-links { display: flex; gap: 0; flex: 1; }
+.nav-link {
+  padding: 0 16px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: none;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+}
+.nav-link:hover { color: var(--text); }
+.nav-link.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.nav-user { font-size: 12px; color: var(--text-2); }
+.btn-ghost {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: none;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-ghost:hover { border-color: var(--border-strong); color: var(--text); background: var(--bg); }
+.btn-accent {
+  padding: 7px 14px;
+  border: none;
+  border-radius: var(--r);
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-accent:hover { background: #1B4332; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-danger-ghost {
+  padding: 5px 10px;
+  border: 1px solid #FECACA;
+  border-radius: var(--r);
+  background: none;
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--danger-t);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all .15s;
+}
+.btn-danger-ghost:hover { background: var(--danger); }
+
+.page { display: none; padding: 32px 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
+.page.active { display: block; }
+
+/* ── RECIPES ── */
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.page-header h2 { font-size: 26px; }
+.search-wrap { position: relative; margin-bottom: 20px; }
+.search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-3); width: 15px; height: 15px; }
+.search-input {
+  width: 100%;
+  padding: 9px 14px 9px 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.search-input:focus { border-color: var(--accent); }
+.recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.recipe-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px;
+  cursor: pointer;
+  transition: all .15s;
+  animation: fadeIn .2s ease;
+}
+.recipe-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow); transform: translateY(-1px); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.rc-emoji { font-size: 30px; margin-bottom: 10px; }
+.rc-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.rc-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.cat-tag {
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.cat-breakfast { background: var(--breakfast); color: var(--breakfast-t); }
+.cat-lunch { background: var(--lunch); color: var(--lunch-t); }
+.cat-dinner { background: var(--dinner); color: var(--dinner-t); }
+.cat-snack { background: var(--snack); color: var(--snack-t); }
+.rc-time { font-size: 12px; color: var(--text-3); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-3); }
+.empty-state .es-icon { font-size: 40px; margin-bottom: 12px; opacity: .4; }
+.empty-state p { font-size: 14px; }
+
+/* ── PLAN ── */
+.plan-controls { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.period-label { font-family: 'Instrument Serif', serif; font-size: 20px; flex: 1; min-width: 180px; }
+.mode-toggle { display: flex; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.mode-btn {
+  padding: 7px 14px;
+  border: none;
+  background: none;
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-2);
+  transition: all .15s;
+}
+.mode-btn.active { background: var(--accent); color: #fff; }
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.month-header-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+.month-day-name { text-align: center; font-size: 11px; font-weight: 600; color: var(--text-3); padding: 4px 0; letter-spacing: .04em; }
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.day-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  min-width: 0;
+}
+.day-col.today { border-color: var(--accent); }
+.day-head {
+  background: var(--bg);
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-2);
+}
+.day-head .day-num { font-size: 16px; font-weight: 600; display: block; line-height: 1.2; color: var(--text); }
+.day-col.today .day-head { background: var(--accent-light); }
+.day-col.today .day-head .day-num { color: var(--accent); }
+.meal-slots { padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.meal-slot { border-radius: 6px; overflow: hidden; }
+.slot-head { font-size: 9px; font-weight: 700; padding: 2px 6px; letter-spacing: .05em; text-transform: uppercase; }
+.slot-head.breakfast { background: var(--breakfast); color: var(--breakfast-t); }
+.slot-head.lunch { background: var(--lunch); color: var(--lunch-t); }
+.slot-head.dinner { background: var(--dinner); color: var(--dinner-t); }
+.slot-head.snack { background: var(--snack); color: var(--snack-t); }
+.slot-body { padding: 2px 4px 4px; display: flex; flex-direction: column; gap: 2px; }
+.meal-chip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 5px;
+  background: var(--bg);
+  border-radius: 4px;
+  font-size: 10px;
+  min-width: 0;
+}
+.meal-chip span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meal-chip button {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color .12s;
+}
+.meal-chip button:hover { color: var(--danger-t); }
+.add-slot-btn {
+  font-size: 9px;
+  color: var(--text-3);
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 1px 5px;
+  width: 100%;
+  text-align: left;
+  transition: color .12s;
+}
+.add-slot-btn:hover { color: var(--accent); }
+
+/* month compact */
+.month-day-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 70px;
+}
+.month-day-col.today { border-color: var(--accent); }
+.month-day-num {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 6px 2px;
+  color: var(--text-2);
+  text-align: right;
+}
+.month-day-col.today .month-day-num { color: var(--accent); }
+.month-meal-dots { padding: 0 4px 4px; display: flex; flex-direction: column; gap: 1px; }
+.month-dot {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.month-dot.breakfast { background: var(--breakfast); color: var(--breakfast-t); }
+.month-dot.lunch { background: var(--lunch); color: var(--lunch-t); }
+.month-dot.dinner { background: var(--dinner); color: var(--dinner-t); }
+.month-dot.snack { background: var(--snack); color: var(--snack-t); }
+.month-add-btn {
+  font-size: 9px;
+  color: var(--text-3);
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 1px 4px;
+  width: 100%;
+  text-align: left;
+  transition: color .12s;
+}
+.month-add-btn:hover { color: var(--accent); }
+
+/* ── SHOPPING ── */
+.shop-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px 20px; }
+.stat-num { font-family: 'Instrument Serif', serif; font-size: 28px; color: var(--accent); }
+.stat-lbl { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.shop-section { margin-bottom: 20px; }
+.shop-section-title { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.shop-item { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.shop-item:last-child { border-bottom: none; }
+.shop-item input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+.shop-item label { font-size: 14px; cursor: pointer; flex: 1; }
+.shop-item label.checked { text-decoration: line-through; color: var(--text-3); }
+.shop-item .shop-amt { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.15);
+  animation: modalIn .18s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+.modal h3 { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; margin-bottom: 20px; }
+.fg { margin-bottom: 14px; }
+.fg label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--text-2); margin-bottom: 5px; }
+.fg input, .fg select, .fg textarea {
+  width: 100%;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--accent); background: var(--surface); }
+.fg textarea { height: 80px; resize: vertical; }
+.ingr-row { display: flex; gap: 8px; margin-bottom: 7px; align-items: center; }
+.ingr-row input { flex: 1; }
+.ingr-row input:nth-child(2) { width: 90px; flex: none; }
+.ingr-rm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 20px; padding: 0 3px; transition: color .12s; }
+.ingr-rm:hover { color: var(--danger-t); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+.recipe-select-list { border: 1px solid var(--border); border-radius: var(--r); max-height: 260px; overflow-y: auto; }
+.rsel-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+.rsel-item:last-child { border-bottom: none; }
+.rsel-item:hover { background: var(--bg); }
+.rsel-item .ri-emoji { font-size: 22px; flex-shrink: 0; }
+.rsel-item .ri-info { flex: 1; min-width: 0; }
+.rsel-item .ri-name { font-size: 13px; font-weight: 600; }
+.rsel-item .ri-sub { font-size: 11px; color: var(--text-2); }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--text);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all .2s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: none; }
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 300;
+}
+.loading-screen .logo { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--accent); }
+.loader { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading-screen">
+  <div class="logo">Меню</div>
+  <div class="loader"></div>
+</div>
+
+<!-- AUTH -->
+<div class="auth-screen" id="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">Меню</div>
+    <div class="auth-sub">Планировщик питания для двоих</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Войти</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Создать аккаунт</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Пароль</label>
+      <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <div class="form-group" id="name-group" style="display:none">
+      <label>Имя</label>
+      <input type="text" id="auth-name" placeholder="Как тебя зовут?">
+    </div>
+    <button class="btn-full" id="auth-btn" onclick="submitAuth()">Войти</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <nav class="topnav">
+    <span class="nav-brand">Меню</span>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('recipes')" id="nl-recipes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Рецепты
+      </button>
+      <button class="nav-link" onclick="showPage('plan')" id="nl-plan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Планировщик
+      </button>
+      <button class="nav-link" onclick="showPage('shopping')" id="nl-shopping">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Покупки
+      </button>
+    </div>
+    <div class="nav-right">
+      <span class="nav-user" id="nav-user-name"></span>
+      <button class="btn-ghost btn-sm" onclick="signOut()">Выйти</button>
+    </div>
+  </nav>
+
+  <!-- RECIPES PAGE -->
+  <div class="page active" id="page-recipes">
+    <div class="page-header">
+      <h2>Рецепты</h2>
+      <button class="btn-accent" onclick="openRecipeModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Новый рецепт
+      </button>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" type="text" placeholder="Поиск по названию или категории..." id="recipe-search" oninput="renderRecipes()">
+    </div>
+    <div class="recipe-grid" id="recipe-grid">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="es-icon">📖</div>
+        <p>Загружаем рецепты...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN PAGE -->
+  <div class="page" id="page-plan">
+    <div class="plan-controls">
+      <button class="btn-ghost btn-sm" onclick="navPeriod(-1)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="period-label" id="period-label"></span>
+      <button class="btn-ghost btn-sm" onclick="navPeriod(1)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button class="btn-ghost btn-sm" onclick="goToday()">Сегодня</button>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="wm-week" onclick="setMode('week')">Неделя</button>
+        <button class="mode-btn" id="wm-month" onclick="setMode('month')">Месяц</button>
+      </div>
+    </div>
+    <div id="plan-container"></div>
+  </div>
+
+  <!-- SHOPPING PAGE -->
+  <div class="page" id="page-shopping">
+    <div class="page-header">
+      <h2>Список покупок</h2>
+      <button class="btn-accent" onclick="genShopping()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Обновить из плана
+      </button>
+    </div>
+    <div id="shopping-content"></div>
+  </div>
+</div>
+
+<!-- MODAL: recipe form -->
+<div class="modal-overlay" id="modal-recipe">
+  <div class="modal">
+    <h3 id="modal-recipe-title">Новый рецепт</h3>
+    <div class="fg"><label>Эмодзи</label><input type="text" id="r-emoji" maxlength="4" placeholder="🍽️" style="width:70px"></div>
+    <div class="fg"><label>Название</label><input type="text" id="r-name" placeholder="Паста карбонара"></div>
+    <div class="fg"><label>Категория</label>
+      <select id="r-cat">
+        <option value="breakfast">Завтрак</option>
+        <option value="lunch">Обед</option>
+        <option value="dinner">Ужин</option>
+        <option value="snack">Перекус</option>
+      </select>
+    </div>
+    <div class="fg"><label>Время (мин)</label><input type="number" id="r-time" placeholder="30" style="width:90px"></div>
+    <div class="fg">
+      <label>Ингредиенты</label>
+      <div id="ingr-list"></div>
+      <button class="btn-ghost btn-sm" onclick="addIngrRow()" style="margin-top:6px">+ Добавить ингредиент</button>
+    </div>
+    <div class="fg"><label>Способ приготовления</label><textarea id="r-desc" placeholder="Опишите шаги приготовления..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-recipe')">Отмена</button>
+      <button class="btn-accent" onclick="saveRecipe()">Сохранить рецепт</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: recipe detail -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal" id="modal-detail-body"></div>
+</div>
+
+<!-- MODAL: add to plan -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <h3 id="add-modal-title">Добавить блюдо</h3>
+    <div id="add-modal-sub" style="font-size:13px;color:var(--text-2);margin-bottom:14px"></div>
+    <input class="search-input" type="text" id="add-search" placeholder="Поиск рецепта..." oninput="renderAddList()" style="margin-bottom:12px;padding-left:14px">
+    <div class="recipe-select-list" id="add-list"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('modal-add')">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 🔧 ВСТАВЬ СЮДА СВОИ КЛЮЧИ SUPABASE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SUPABASE_URL = 'https://ocjexyhnbczxtvwvtmhj.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_WaiZccObbSfG_pO1jTNUwA_GMN606Qn'
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const { createClient } = supabase
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const MEAL_TYPES = [
+  { key: 'breakfast', label: 'Завтрак' },
+  { key: 'lunch',     label: 'Обед'    },
+  { key: 'dinner',    label: 'Ужин'    },
+  { key: 'snack',     label: 'Перекус' }
+]
+const CAT_LABELS = { breakfast: 'Завтрак', lunch: 'Обед', dinner: 'Ужин', snack: 'Перекус' }
+const RU_DAYS = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']
+const RU_MONTHS_FULL = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
+const RU_MONTHS_GEN  = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
+
+let currentUser = null
+let recipes = []
+let planEntries = [] // { id, date, meal_type, recipe_id }
+let shopping = {}
+let editingId = null
+let addCtx = null
+let viewMode = 'week'
+let weekOffset = 0
+let monthOffset = 0
+
+// ─── AUTH ───────────────────────────────────────────
+let authMode = 'login'
+
+function switchAuthTab(mode) {
+  authMode = mode
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && mode === 'login') || (i === 1 && mode === 'register'))
+  })
+  document.getElementById('name-group').style.display = mode === 'register' ? 'block' : 'none'
+  document.getElementById('auth-btn').textContent = mode === 'login' ? 'Войти' : 'Создать аккаунт'
+  document.getElementById('auth-error').classList.remove('show')
+}
+
+async function submitAuth() {
+  const email    = document.getElementById('auth-email').value.trim()
+  const password = document.getElementById('auth-password').value
+  const btn      = document.getElementById('auth-btn')
+  const errEl    = document.getElementById('auth-error')
+  if (!email || !password) { showAuthError('Введи email и пароль'); return }
+  btn.disabled = true
+  btn.textContent = '...'
+  errEl.classList.remove('show')
+  let result
+  if (authMode === 'login') {
+    result = await sb.auth.signInWithPassword({ email, password })
+  } else {
+    const name = document.getElementById('auth-name').value.trim() || email.split('@')[0]
+    result = await sb.auth.signUp({ email, password, options: { data: { name } } })
+  }
+  if (result.error) {
+    showAuthError(translateError(result.error.message))
+    btn.disabled = false
+    btn.textContent = authMode === 'login' ? 'Войти' : 'Создать аккаунт'
+  }
+}
+
+function translateError(msg) {
+  if (msg.includes('Invalid login')) return 'Неверный email или пароль'
+  if (msg.includes('already registered')) return 'Этот email уже зарегистрирован'
+  if (msg.includes('Password should be')) return 'Пароль должен быть не менее 6 символов'
+  return msg
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error')
+  el.textContent = msg
+  el.classList.add('show')
+}
+
+async function signOut() {
+  await sb.auth.signOut()
+}
+
+// ─── INIT ────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) {
+    await initApp(session.user)
+  } else {
+    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('auth-screen').style.display = 'flex'
+  }
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      document.getElementById('auth-screen').style.display = 'none'
+      document.getElementById('loading-screen').style.display = 'flex'
+      await initApp(session.user)
+    }
+    if (event === 'SIGNED_OUT') {
+      document.getElementById('app').classList.remove('visible')
+      document.getElementById('auth-screen').style.display = 'flex'
+      recipes = []; planEntries = []; shopping = {}
+    }
+  })
+})
+
+async function initApp(user) {
+  currentUser = user
+  const name = user.user_metadata?.name || user.email.split('@')[0]
+  document.getElementById('nav-user-name').textContent = name
+  await Promise.all([loadRecipes(), loadPlan()])
+  document.getElementById('loading-screen').style.display = 'none'
+  document.getElementById('app').classList.add('visible')
+  renderRecipes()
+  renderPlan()
+  renderShopping()
+}
+
+// ─── RECIPES ─────────────────────────────────────────
+async function loadRecipes() {
+  const { data, error } = await sb.from('recipes').select('*, ingredients(*)').order('created_at', { ascending: false })
+  if (!error) recipes = data || []
+}
+
+function renderRecipes() {
+  const q = (document.getElementById('recipe-search')?.value || '').toLowerCase()
+  const grid = document.getElementById('recipe-grid')
+  const f = recipes.filter(r => r.name.toLowerCase().includes(q) || CAT_LABELS[r.category]?.toLowerCase().includes(q))
+  if (!f.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🔍</div><p>${recipes.length ? 'Рецепты не найдены' : 'Добавьте первый рецепт!'}</p></div>`
+    return
+  }
+  grid.innerHTML = f.map(r => `
+    <div class="recipe-card" onclick="openDetail(${r.id})">
+      <div class="rc-emoji">${r.emoji || '🍽️'}</div>
+      <div class="rc-name">${r.name}</div>
+      <div class="rc-meta">
+        <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
+        ${r.cook_time ? `<span class="rc-time">⏱ ${r.cook_time} мин</span>` : ''}
+      </div>
+    </div>`).join('')
+}
+
+function openDetail(id) {
+  const r = recipes.find(x => x.id === id)
+  if (!r) return
+  document.getElementById('modal-detail-body').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <span style="font-size:36px">${r.emoji || '🍽️'}</span>
+        <div>
+          <div style="font-size:18px;font-weight:600;margin-bottom:6px">${r.name}</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
+            ${r.cook_time ? `<span style="font-size:12px;color:var(--text-2)">⏱ ${r.cook_time} мин</span>` : ''}
+          </div>
+        </div>
+      </div>
+      <button class="btn-ghost btn-sm" onclick="closeModal('modal-detail')" style="flex-shrink:0">✕</button>
+    </div>
+    ${r.ingredients?.length ? `
+      <div style="background:var(--bg);border-radius:var(--r);padding:14px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px">Ингредиенты</div>
+        ${r.ingredients.map(i => `
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+            <span>${i.name}</span><span style="color:var(--text-2)">${i.amount || ''}</span>
+          </div>`).join('')}
+      </div>` : ''}
+    ${r.description ? `<div style="font-size:13px;line-height:1.7;color:var(--text-2);margin-bottom:18px">${r.description}</div>` : ''}
+    <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn-danger-ghost" onclick="deleteRecipe(${r.id})">🗑 Удалить</button>
+      <button class="btn-ghost btn-sm" onclick="closeModal('modal-detail');openRecipeModal(${r.id})">✏️ Изменить</button>
+    </div>`
+  openModal('modal-detail')
+}
+
+async function deleteRecipe(id) {
+  if (!confirm('Удалить рецепт? Он также пропадёт из плана.')) return
+  await sb.from('ingredients').delete().eq('recipe_id', id)
+  await sb.from('plan_entries').delete().eq('recipe_id', id)
+  await sb.from('recipes').delete().eq('id', id)
+  recipes = recipes.filter(r => r.id !== id)
+  planEntries = planEntries.filter(e => e.recipe_id !== id)
+  closeModal('modal-detail')
+  renderRecipes()
+  toast('Рецепт удалён')
+}
+
+function openRecipeModal(id) {
+  editingId = id || null
+  const r = id ? recipes.find(x => x.id === id) : null
+  document.getElementById('modal-recipe-title').textContent = r ? 'Редактировать рецепт' : 'Новый рецепт'
+  document.getElementById('r-emoji').value = r?.emoji || '🍽️'
+  document.getElementById('r-name').value = r?.name || ''
+  document.getElementById('r-cat').value = r?.category || 'breakfast'
+  document.getElementById('r-time').value = r?.cook_time || ''
+  document.getElementById('r-desc').value = r?.description || ''
+  const il = document.getElementById('ingr-list')
+  il.innerHTML = ''
+  const ingrs = r?.ingredients?.length ? r.ingredients : [{ name: '', amount: '' }]
+  ingrs.forEach(i => addIngrRow(i.name, i.amount))
+  openModal('modal-recipe')
+}
+
+function addIngrRow(name = '', amount = '') {
+  const il = document.getElementById('ingr-list')
+  const row = document.createElement('div')
+  row.className = 'ingr-row'
+  row.innerHTML = `<input type="text" placeholder="Ингредиент" value="${name}"><input type="text" placeholder="Кол-во" value="${amount}" style="width:90px;flex:none"><button class="ingr-rm" onclick="this.parentElement.remove()" aria-label="Удалить">×</button>`
+  il.appendChild(row)
+}
+
+async function saveRecipe() {
+  const name = document.getElementById('r-name').value.trim()
+  if (!name) { toast('Введи название рецепта'); return }
+  const ingredients = Array.from(document.querySelectorAll('#ingr-list .ingr-row')).map(row => {
+    const inputs = row.querySelectorAll('input')
+    return { name: inputs[0].value.trim(), amount: inputs[1].value.trim() }
+  }).filter(i => i.name)
+
+  const payload = {
+    name,
+    emoji: document.getElementById('r-emoji').value || '🍽️',
+    category: document.getElementById('r-cat').value,
+    cook_time: parseInt(document.getElementById('r-time').value) || null,
+    description: document.getElementById('r-desc').value.trim() || null,
+    user_id: currentUser.id
+  }
+
+  let recipeId = editingId
+  if (editingId) {
+    await sb.from('recipes').update(payload).eq('id', editingId)
+    await sb.from('ingredients').delete().eq('recipe_id', editingId)
+  } else {
+    const { data } = await sb.from('recipes').insert(payload).select().single()
+    recipeId = data.id
+  }
+  if (ingredients.length) {
+    await sb.from('ingredients').insert(ingredients.map(i => ({ ...i, recipe_id: recipeId })))
+  }
+  await loadRecipes()
+  closeModal('modal-recipe')
+  renderRecipes()
+  toast(editingId ? 'Рецепт обновлён' : 'Рецепт добавлен!')
+}
+
+// ─── PLAN ────────────────────────────────────────────
+async function loadPlan() {
+  const { data, error } = await sb.from('plan_entries').select('*').order('date')
+  if (!error) planEntries = data || []
+}
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+function todayKey() { return dateKey(new Date()) }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r }
+function getMonday(d) {
+  const dt = new Date(d); const day = dt.getDay() || 7
+  dt.setDate(dt.getDate() - day + 1); return dt
+}
+
+function currentWeekStart() { return addDays(getMonday(new Date()), weekOffset * 7) }
+function currentMonthDate() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth() + monthOffset, 1) }
+
+function setMode(m) {
+  viewMode = m
+  document.getElementById('wm-week').classList.toggle('active', m === 'week')
+  document.getElementById('wm-month').classList.toggle('active', m === 'month')
+  renderPlan()
+}
+function navPeriod(dir) {
+  if (viewMode === 'week') weekOffset += dir; else monthOffset += dir
+  renderPlan()
+}
+function goToday() { weekOffset = 0; monthOffset = 0; renderPlan() }
+
+function getEntriesForDay(dk) {
+  return planEntries.filter(e => e.date === dk)
+}
+
+function renderPlan() {
+  viewMode === 'week' ? renderWeek() : renderMonth()
+}
+
+function renderWeek() {
+  const start = currentWeekStart()
+  const end = addDays(start, 6)
+  const today = todayKey()
+  const sm = RU_MONTHS_GEN[start.getMonth()], em = RU_MONTHS_GEN[end.getMonth()]
+  document.getElementById('period-label').textContent =
+    start.getMonth() === end.getMonth()
+      ? `${start.getDate()}–${end.getDate()} ${sm} ${start.getFullYear()}`
+      : `${start.getDate()} ${sm} – ${end.getDate()} ${em} ${start.getFullYear()}`
+
+  const days = Array.from({ length: 7 }, (_, i) => addDays(start, i))
+  document.getElementById('plan-container').innerHTML = `
+    <div class="week-grid">
+      ${days.map((d, i) => {
+        const dk = dateKey(d), isToday = dk === today
+        const entries = getEntriesForDay(dk)
+        return `<div class="day-col${isToday ? ' today' : ''}">
+          <div class="day-head${isToday ? ' today' : ''}">
+            ${RU_DAYS[i]}<span class="day-num">${d.getDate()}</span>
+          </div>
+          <div class="meal-slots">
+            ${MEAL_TYPES.map(mt => {
+              const meals = entries.filter(e => e.meal_type === mt.key)
+              return `<div class="meal-slot">
+                <div class="slot-head ${mt.key}">${mt.label}</div>
+                <div class="slot-body">
+                  ${meals.map(e => {
+                    const r = recipes.find(x => x.id === e.recipe_id)
+                    return r ? `<div class="meal-chip"><span title="${r.name}">${r.emoji || '🍽️'} ${r.name}</span><button onclick="removeMeal(${e.id})" aria-label="Убрать">×</button></div>` : ''
+                  }).join('')}
+                  <button class="add-slot-btn" onclick="openAddModal('${dk}','${mt.key}','${mt.label}',${d.getDate()},'${RU_MONTHS_GEN[d.getMonth()]}')">+ добавить</button>
+                </div>
+              </div>`
+            }).join('')}
+          </div>
+        </div>`
+      }).join('')}
+    </div>`
+}
+
+function renderMonth() {
+  const base = currentMonthDate()
+  const today = todayKey()
+  document.getElementById('period-label').textContent = `${RU_MONTHS_FULL[base.getMonth()]} ${base.getFullYear()}`
+  const firstDay = (base.getDay() || 7) - 1
+  const daysInMonth = new Date(base.getFullYear(), base.getMonth() + 1, 0).getDate()
+  let html = `
+    <div class="month-header-row">${RU_DAYS.map(d => `<div class="month-day-name">${d}</div>`).join('')}</div>
+    <div class="month-grid">
+    ${'<div></div>'.repeat(firstDay)}`
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(base.getFullYear(), base.getMonth(), day)
+    const dk = dateKey(d), isToday = dk === today
+    const entries = getEntriesForDay(dk)
+    html += `<div class="month-day-col${isToday ? ' today' : ''}">
+      <div class="month-day-num">${day}</div>
+      <div class="month-meal-dots">
+        ${MEAL_TYPES.map(mt => {
+          const meals = entries.filter(e => e.meal_type === mt.key)
+          return meals.slice(0, 2).map(e => {
+            const r = recipes.find(x => x.id === e.recipe_id)
+            return r ? `<div class="month-dot ${mt.key}" title="${r.name}">${r.emoji || '🍽️'} ${r.name}</div>` : ''
+          }).join('')
+        }).join('')}
+        <button class="month-add-btn" onclick="openAddModal('${dk}','breakfast','Завтрак',${day},'${RU_MONTHS_GEN[d.getMonth()]}')">+</button>
+      </div>
+    </div>`
+  }
+  html += `</div>`
+  document.getElementById('plan-container').innerHTML = html
+}
+
+function openAddModal(dk, mealKey, mealLabel, dayNum, monthName) {
+  addCtx = { dk, mealKey }
+  document.getElementById('add-modal-title').textContent = `Добавить в ${mealLabel.toLowerCase()}`
+  document.getElementById('add-modal-sub').textContent = `${dayNum} ${monthName}`
+  document.getElementById('add-search').value = ''
+  renderAddList()
+  openModal('modal-add')
+}
+
+function renderAddList() {
+  const q = (document.getElementById('add-search')?.value || '').toLowerCase()
+  const list = document.getElementById('add-list')
+  const f = recipes.filter(r => r.name.toLowerCase().includes(q) || CAT_LABELS[r.category]?.toLowerCase().includes(q))
+  if (!f.length) { list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Рецептов не найдено</div>'; return }
+  list.innerHTML = f.map(r => `
+    <div class="rsel-item" onclick="addMealToPlan(${r.id})">
+      <span class="ri-emoji">${r.emoji || '🍽️'}</span>
+      <div class="ri-info">
+        <div class="ri-name">${r.name}</div>
+        <div class="ri-sub">${CAT_LABELS[r.category] || r.category}${r.cook_time ? ' · ' + r.cook_time + ' мин' : ''}</div>
+      </div>
+      <span class="cat-tag cat-${r.category}">${CAT_LABELS[r.category] || r.category}</span>
+    </div>`).join('')
+}
+
+async function addMealToPlan(recipe_id) {
+  const { dk, mealKey } = addCtx
+  const { data, error } = await sb.from('plan_entries').insert({
+    date: dk,
+    meal_type: mealKey,
+    recipe_id,
+    user_id: currentUser.id
+  }).select().single()
+  if (!error) {
+    planEntries.push(data)
+    closeModal('modal-add')
+    renderPlan()
+  }
+}
+
+async function removeMeal(entryId) {
+  await sb.from('plan_entries').delete().eq('id', entryId)
+  planEntries = planEntries.filter(e => e.id !== entryId)
+  renderPlan()
+}
+
+// ─── SHOPPING ────────────────────────────────────────
+async function genShopping() {
+  const all = {}
+  planEntries.forEach(e => {
+    const r = recipes.find(x => x.id === e.recipe_id)
+    if (!r) return
+    ;(r.ingredients || []).forEach(i => {
+      if (!i.name) return
+      const k = i.name.toLowerCase().trim()
+      if (!all[k]) all[k] = { name: i.name, amounts: [], checked: false }
+      if (i.amount) all[k].amounts.push(i.amount)
+    })
+  })
+  shopping = all
+  renderShopping()
+  toast('Список обновлён!')
+}
+
+function renderShopping() {
+  const el = document.getElementById('shopping-content')
+  const items = Object.values(shopping)
+  const totalMeals = planEntries.length
+  const checked = items.filter(i => i.checked).length
+
+  if (!items.length) {
+    const hasPlan = planEntries.length > 0
+    el.innerHTML = `<div class="empty-state"><div class="es-icon">🛒</div><p>${hasPlan ? 'Нажми «Обновить из плана» чтобы собрать список' : 'Сначала добавь блюда в планировщик'}</p></div>`
+    return
+  }
+  el.innerHTML = `
+    <div class="shop-stats">
+      <div class="stat-card"><div class="stat-num">${items.length}</div><div class="stat-lbl">позиций</div></div>
+      <div class="stat-card"><div class="stat-num">${totalMeals}</div><div class="stat-lbl">блюд в плане</div></div>
+      <div class="stat-card"><div class="stat-num">${checked}/${items.length}</div><div class="stat-lbl">куплено</div></div>
+    </div>
+    <div class="shop-section">
+      <div class="shop-section-title">Продукты</div>
+      ${items.map((item, i) => {
+        const k = Object.keys(shopping)[i]
+        const uniqAmts = [...new Set(item.amounts)]
+        return `<div class="shop-item">
+          <input type="checkbox" id="si${i}" ${item.checked ? 'checked' : ''} onchange="toggleShop('${k}',this.checked,${i})">
+          <label for="si${i}" class="${item.checked ? 'checked' : ''}">${item.name}</label>
+          ${uniqAmts.length ? `<span class="shop-amt">${uniqAmts.join(', ')}</span>` : ''}
+        </div>`
+      }).join('')}
+    </div>`
+}
+
+function toggleShop(k, checked, i) {
+  if (shopping[k]) shopping[k].checked = checked
+  const lbl = document.querySelector(`#si${i} ~ label, label[for="si${i}"]`)
+  if (lbl) lbl.className = checked ? 'checked' : ''
+  const stat = document.querySelector('.stat-card:nth-child(3) .stat-num')
+  if (stat) { const c = Object.values(shopping).filter(x => x.checked).length; stat.textContent = `${c}/${Object.keys(shopping).length}` }
+}
+
+// ─── UTILS ───────────────────────────────────────────
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'))
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'))
+  document.getElementById('page-' + p).classList.add('active')
+  document.getElementById('nl-' + p).classList.add('active')
+  if (p === 'plan') renderPlan()
+  if (p === 'shopping') renderShopping()
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open') }
+function closeModal(id) { document.getElementById(id).classList.remove('open') }
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open') })
+})
+
+let toastTimer
+function toast(msg) {
+  const el = document.getElementById('toast')
+  el.textContent = msg; el.classList.add('show')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500)
+}
+</script>
+</body>
+</html>
